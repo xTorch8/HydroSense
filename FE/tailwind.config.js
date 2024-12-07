@@ -9,6 +9,9 @@ export default {
 				biru2: "#BDE3FF",
 				biru5: "#445EF2",
 			},
+			fontFamily: {
+				quicksand: ["Quicksand", "sansserif"],
+			},
 		},
 	},
 	plugins: [],
