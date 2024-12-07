@@ -25,12 +25,12 @@ const ProductListPage = () => {
 		<>
 			<Navbar currentPage="Product" />
 
-			<div className="md:flex md:flex-row md:justify-center md:items-center md:align-middle">
+			<div className="md:flex md:flex-row md:justify-center md:items-center md:align-middle md:w-4/5 mx-auto">
 				<div className="w-full md:w-3/5">
 					<h1 className="text-4xl text-underline text-center md:text-right font-bold mt-8 underline"> Product List </h1>
 				</div>
 				<div className="w-full mt-8 md:w-2/5">
-					<Button text="Add Product" isPrimary={true} />
+					<Button text="Add Product" isPrimary={true} align="right" />
 				</div>
 			</div>
 
