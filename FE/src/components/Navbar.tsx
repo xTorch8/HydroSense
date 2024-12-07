@@ -1,12 +1,27 @@
+import { useNavigate } from "react-router";
 import NavbarType from "../types/NavbarType";
 import logo from "../assets/logo.png";
 
 const Navbar = (props: NavbarType) => {
-	const links = {
-		Dashboard: props.currentPage === "Dashboard",
-		Product: props.currentPage === "Product",
-		Profile: props.currentPage === "Profile",
-	};
+	const links = [
+		{
+			text: "Dashboard",
+			isActive: props.currentPage == "Dashboard",
+			link: "/dashboard",
+		},
+		{
+			text: "Product",
+			isActive: props.currentPage == "Product",
+			link: "/products",
+		},
+		{
+			text: "Profile",
+			isActive: props.currentPage == "Profile",
+			link: "/profile",
+		},
+	];
+
+	const navigate = useNavigate();
 
 	return (
 		<header className="bg-navy p-4 flex flex-row justify-between top-0 sticky">
@@ -15,10 +30,10 @@ const Navbar = (props: NavbarType) => {
 			</div>
 			<nav>
 				<ul className="flex flex-row">
-					{Object.keys(links).map((key, index) => {
+					{links.map((item, index) => {
 						let className = "mx-4 cursor-pointer ";
 
-						if (links[key as keyof typeof links]) {
+						if (item.isActive) {
 							className += "text-biru5 underline decoration-biru5";
 						} else {
 							className += "text-white hover:underline hover:decoration-biru-5 hover:text-biru5";
@@ -26,7 +41,9 @@ const Navbar = (props: NavbarType) => {
 
 						return (
 							<li key={index}>
-								<a className={className}> {key} </a>
+								<a className={className} onClick={() => navigate(item.link)}>
+									{item.text}
+								</a>
 							</li>
 						);
 					})}
