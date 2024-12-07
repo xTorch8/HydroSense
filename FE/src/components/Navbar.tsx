@@ -9,7 +9,7 @@ const Navbar = (props: NavbarType) => {
 	};
 
 	return (
-		<header className="bg-navy p-4 flex flex-row justify-between">
+		<header className="bg-navy p-4 flex flex-row justify-between top-0 sticky">
 			<div>
 				<img src={logo} alt="HydroSense logo" />
 			</div>
