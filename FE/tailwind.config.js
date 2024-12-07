@@ -5,6 +5,7 @@ export default {
 		extend: {
 			colors: {
 				navy: "#0D1232",
+				biru1: "#C6DBEF",
 				biru5: "#445EF2",
 			},
 		},
