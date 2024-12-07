@@ -6,6 +6,7 @@ export default {
 			colors: {
 				navy: "#0D1232",
 				biru1: "#C6DBEF",
+				biru2: "#BDE3FF",
 				biru5: "#445EF2",
 			},
 		},
