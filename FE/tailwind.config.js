@@ -8,6 +8,7 @@ export default {
 				biru1: "#C6DBEF",
 				biru2: "#BDE3FF",
 				biru5: "#445EF2",
+				darkblue: "#002B58",
 			},
 			fontFamily: {
 				quicksand: ["Quicksand", "sansserif"],
