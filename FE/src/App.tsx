@@ -1,9 +1,11 @@
+import Navbar from "./components/Navbar";
+
 function App() {
-  return (
-    <>
-      <p className="text-2xl font-bold"> Hello World </p>
-    </>
-  )
+	return (
+		<>
+			<Navbar currentPage="Dashboard" />
+		</>
+	);
 }
 
-export default App
+export default App;
