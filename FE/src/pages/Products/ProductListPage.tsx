@@ -4,9 +4,9 @@ import Navbar from "../../components/Navbar";
 import Button from "../../components/Button";
 import ProductItem from "../../components/ProductItem";
 import getProductListHandler from "../../api/dashboard/getProductListHandler";
-import getProductListRequest from "../../types/api/getProductListRequest";
+import getProductListRequest from "../../types/api/dashboard/getProductListRequest";
 import axios from "axios";
-import getProductListResult from "../../types/api/getProductListResult";
+import getProductListResult from "../../types/api/dashboard/getProductListResult";
 import { AuthContext } from "../../context/AuthContext";
 
 const ProductListPage = () => {
@@ -16,7 +16,7 @@ const ProductListPage = () => {
 
 	const authContext = useContext(AuthContext);
 
-	if (authContext == null || authContext?.user == null || authContext?.token == null) {
+	if (authContext == null || authContext?.user == null || authContext?.token == "token" || !authContext.isTokenValidHandler()) {
 		navigate("../auth/login");
 	}
 
