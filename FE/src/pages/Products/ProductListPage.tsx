@@ -1,38 +1,51 @@
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router";
 import Navbar from "../../components/Navbar";
-// import Cards from "../../components/Cards";
 import Button from "../../components/Button";
 import ProductItem from "../../components/ProductItem";
+import getProductListHandler from "../../api/dashboard/getProductListHandler";
+import getProductListRequest from "../../types/api/getProductListRequest";
+import axios from "axios";
+import getProductListResult from "../../types/api/getProductListResult";
+import { AuthContext } from "../../context/AuthContext";
 
 const ProductListPage = () => {
 	let navigate = useNavigate();
 
-	let dummyData = [
-		{
-			id: 1,
-			name: "Mineral Cup",
-			description:
-				"Aqua Mineral Cup memberikan kemudahan untuk kebutuhan hidrasi Anda. Dikemas secara higienis dengan air dari sumber terbaik, menjaga kualitas dan kemurniannya hingga siap dinikmati.",
-			image:
-				"https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//110/MTA-68556755/aqua_aqua_air_mineral_gelas_cup_220ml_-1_box_48_cup-_full01_oopjgexh.jpg",
-		},
-		{
-			id: 2,
-			name: "Galon",
-			description:
-				"Aqua Mineral Cup memberikan kemudahan untuk kebutuhan hidrasi Anda. Dikemas secara higienis dengan air dari sumber terbaik, menjaga kualitas dan kemurniannya hingga siap dinikmati.",
-			image:
-				"https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//110/MTA-68556755/aqua_aqua_air_mineral_gelas_cup_220ml_-1_box_48_cup-_full01_oopjgexh.jpg",
-		},
-		{
-			id: 3,
-			name: "Mineral Bottle",
-			description:
-				"Aqua Mineral Cup memberikan kemudahan untuk kebutuhan hidrasi Anda. Dikemas secara higienis dengan air dari sumber terbaik, menjaga kualitas dan kemurniannya hingga siap dinikmati.",
-			image:
-				"https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//110/MTA-68556755/aqua_aqua_air_mineral_gelas_cup_220ml_-1_box_48_cup-_full01_oopjgexh.jpg",
-		},
-	];
+	const [data, setData] = useState<getProductListResult[]>([]);
+
+	const authContext = useContext(AuthContext);
+
+	if (authContext == null || authContext?.user == null || authContext?.token == null) {
+		navigate("../auth/login");
+	}
+
+	useEffect(() => {
+		const fetchProductList = async () => {
+			try {
+				const request: getProductListRequest = {
+					companyId: authContext?.user?.companyId.toString()!,
+					token: authContext?.token!,
+				};
+
+				const response = await getProductListHandler(request);
+
+				if (axios.isAxiosError(response)) {
+					if (response.status === 401) {
+						navigate("../auth/login");
+					} else {
+						console.log(response.status);
+					}
+				} else {
+					setData(response);
+				}
+			} catch (e) {
+				setData([]);
+			}
+		};
+
+		fetchProductList();
+	}, []);
 
 	return (
 		<>
@@ -48,37 +61,24 @@ const ProductListPage = () => {
 			</div>
 
 			<div className="mx-auto w-1/2 mt-8 md:w-4/5">
-				{dummyData.map((item) => {
+				{data.map((item) => {
 					return (
 						<ProductItem
-							id={item.id.toString()}
-							title={item.name}
-							description={item.description}
-							imagePath={item.image}
+							id={item.product_id.toString()}
+							key={item.product_id.toString()}
+							title={item.product_name}
+							description={item.product_description}
+							imagePath={item.product_image}
 							onClick={() => {
 								navigate("/products/detail", {
 									state: {
-										id: item.id,
-										name: item.name,
-										image: item.image,
+										id: item.product_id,
+										name: item.product_name,
+										image: item.product_image,
 									},
 								});
 							}}
 						/>
-						// <Cards
-						// 	imagePath={item.image}
-						// 	text={item.name}
-						// 	key={item.id}
-						// 	onClick={() => {
-						// 		navigate("/products/detail", {
-						// 			state: {
-						// 				id: item.id,
-						// 				name: item.name,
-						// 				image: item.image,
-						// 			},
-						// 		});
-						// 	}}
-						// />
 					);
 				})}
 			</div>
