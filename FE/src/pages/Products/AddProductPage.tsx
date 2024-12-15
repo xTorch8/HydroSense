@@ -271,8 +271,8 @@ const AddProductPage = () => {
 				if (formState[name as keyof typeof formState] != undefined) {
 					const value = formState[name as keyof typeof formState];
 
-					if (value != undefined && typeof value == "number") {
-						if (value < range[0] || value > range[1]) {
+					if (value != undefined && typeof value == "string") {
+						if (+value < range[0] || +value > range[1]) {
 							errorList.push(`${name} must be between ${range[0]} and ${range[1]}!`);
 						}
 					}
@@ -291,12 +291,10 @@ const AddProductPage = () => {
 
 	const submitFormHandler = async () => {
 		try {
-			
-		}
-		catch (e) {
+		} catch (e) {
 			setError(["Internal server error"]);
 		}
-	}
+	};
 
 	useEffect(() => {
 		setError([]);
