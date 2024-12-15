@@ -56,7 +56,14 @@ const ProductListPage = () => {
 					<h1 className="text-4xl text-underline text-center md:text-right font-bold mt-8 underline"> Product List </h1>
 				</div>
 				<div className="w-full mt-8 md:w-2/5">
-					<Button text="Add Product" isPrimary={true} align="right" />
+					<Button
+						text="Add Product"
+						isPrimary={true}
+						align="right"
+						onClick={() => {
+							navigate("add");
+						}}
+					/>
 				</div>
 			</div>
 
