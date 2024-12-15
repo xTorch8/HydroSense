@@ -1,4 +1,4 @@
-import ProductItemType from "../types/ProductItemType";
+import ProductItemType from "../types/components/ProductItemType";
 
 const ProductItem = (props: ProductItemType) => {
 	return (
