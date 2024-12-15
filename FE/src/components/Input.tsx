@@ -3,10 +3,15 @@ import { useLocation } from "react-router";
 import InputType from "../types/components/InputType";
 
 const Input = (props: InputType) => {
-	if (props.type != "image") {
+	let color = "text-black";
+	if (props.color == "white") {
+		color = "text-white";
+	}
+
+	if (props.type != "image" && props.type != "textarea") {
 		return (
 			<div className="flex flex-col">
-				<label className="text-md font-semibold" htmlFor={props.id}>
+				<label className={"text-md font-semibold " + color} htmlFor={props.id}>
 					{props.label}:
 				</label>
 				<input
@@ -17,6 +22,21 @@ const Input = (props: InputType) => {
 					placeholder={props.placeholder}
 					onChange={props.onChange}
 					ref={props.ref}
+				/>
+			</div>
+		);
+	} else if (props.type == "textarea") {
+		return (
+			<div className="flex flex-col">
+				<label className={"text-md font-semibold " + color} htmlFor={props.id}>
+					{props.label}:
+				</label>
+				<textarea
+					className="px-4 py-2 rounded-2xl bg-white border-4 border-biru2 mt-2 text-black resize-none h-[14.5rem]"
+					id={props.id}
+					name={props.name}
+					placeholder={props.placeholder}
+					onChange={props.onChange}
 				/>
 			</div>
 		);
@@ -44,9 +64,16 @@ const Input = (props: InputType) => {
 			}
 		};
 
+		let height = 8.5;
+		if (props.imageHeight != null) {
+			height = props.imageHeight;
+		}
+
+		let inputImageClass = `rounded-2xl h-[${height}rem] block mx-auto`;
+
 		return (
 			<div className="flex flex-col row-span-2">
-				<label className="text-lg font-semibold" htmlFor={props.id}>
+				<label className={"text-lg font-semibold " + color} htmlFor={props.id}>
 					{props.label}:
 				</label>
 				<div
@@ -55,7 +82,7 @@ const Input = (props: InputType) => {
 						document.getElementById(props.id)?.click();
 					}}
 				>
-					<img src={productImage} className="rounded-2xl h-[8.5rem] block mx-auto" />
+					<img src={productImage} className={inputImageClass} />
 				</div>
 				<input
 					className="hidden"
