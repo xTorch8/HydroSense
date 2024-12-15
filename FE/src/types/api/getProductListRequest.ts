@@ -1,4 +1,5 @@
 type getProductListRequest = {
+    token: string;
     companyId: string;
 };
 
