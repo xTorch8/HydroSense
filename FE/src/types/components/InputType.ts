@@ -6,6 +6,8 @@ type InputType = {
 	placeholder?: string;
 	width?: string;
 	isDisabled?: boolean;
+	value?: string | number;
+	ref?: React.Ref<HTMLInputElement>
 	onChange?: () => {};
 };
 

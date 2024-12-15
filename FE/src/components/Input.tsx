@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router";
-import InputType from "../types/InputType";
+import { useLocation } from "react-router";
+import InputType from "../types/components/InputType";
 
 const Input = (props: InputType) => {
 	if (props.type != "image") {
@@ -16,6 +16,7 @@ const Input = (props: InputType) => {
 					type={props.type}
 					placeholder={props.placeholder}
 					onChange={props.onChange}
+					ref={props.ref}
 				/>
 			</div>
 		);
@@ -56,7 +57,15 @@ const Input = (props: InputType) => {
 				>
 					<img src={productImage} className="rounded-2xl h-[8.5rem] block mx-auto" />
 				</div>
-				<input className="hidden" id={props.id} name={props.name} type="file" accept=".png,.jpg,.jpeg" onChange={imageChangeHandler} />
+				<input
+					className="hidden"
+					id={props.id}
+					name={props.name}
+					type="file"
+					accept=".png,.jpg,.jpeg"
+					onChange={imageChangeHandler}
+					ref={props.ref}
+				/>
 			</div>
 		);
 	}
