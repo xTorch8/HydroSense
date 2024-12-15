@@ -8,7 +8,7 @@ const Input = (props: InputType) => {
 		color = "text-white";
 	}
 
-	if (props.type != "image" && props.type != "textarea") {
+	if (props.type != "image") {
 		return (
 			<div className="flex flex-col">
 				<label className={"text-md font-semibold " + color} htmlFor={props.id}>
@@ -21,22 +21,7 @@ const Input = (props: InputType) => {
 					type={props.type}
 					placeholder={props.placeholder}
 					onChange={props.onChange}
-					ref={props.ref}
-				/>
-			</div>
-		);
-	} else if (props.type == "textarea") {
-		return (
-			<div className="flex flex-col">
-				<label className={"text-md font-semibold " + color} htmlFor={props.id}>
-					{props.label}:
-				</label>
-				<textarea
-					className="px-4 py-2 rounded-2xl bg-white border-4 border-biru2 mt-2 text-black resize-none h-[14.5rem]"
-					id={props.id}
-					name={props.name}
-					placeholder={props.placeholder}
-					onChange={props.onChange}
+					value={props.value}
 				/>
 			</div>
 		);
@@ -70,6 +55,7 @@ const Input = (props: InputType) => {
 		}
 
 		let inputImageClass = `rounded-2xl h-[${height}rem] block mx-auto`;
+		let containerImageClass = `rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer h-[${height}rem]`;
 
 		return (
 			<div className="flex flex-col row-span-2">
@@ -77,22 +63,14 @@ const Input = (props: InputType) => {
 					{props.label}:
 				</label>
 				<div
-					className="rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer"
+					className={containerImageClass}
 					onClick={() => {
 						document.getElementById(props.id)?.click();
 					}}
 				>
 					<img src={productImage} className={inputImageClass} />
 				</div>
-				<input
-					className="hidden"
-					id={props.id}
-					name={props.name}
-					type="file"
-					accept=".png,.jpg,.jpeg"
-					onChange={imageChangeHandler}
-					ref={props.ref}
-				/>
+				<input className="hidden" id={props.id} name={props.name} type="file" accept=".png,.jpg,.jpeg" onChange={imageChangeHandler} />
 			</div>
 		);
 	}
