@@ -6,9 +6,13 @@ interface IAuthContext {
 	token: string | null;
 }
 
-const AuthContext = createContext<IAuthContext | undefined>(undefined);
+interface IAuthProvider {
+	children: ReactNode;
+}
 
-const AuthProvider = (children: ReactNode) => {
+const AuthContext = createContext<IAuthContext | null>(null);
+
+const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 	const [user, setUser] = useState<AuthType | null>({
 		firstName: "John",
 		lastName: "Doe",
