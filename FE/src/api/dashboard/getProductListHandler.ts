@@ -1,6 +1,6 @@
 import axios from "axios";
 import API_PATH from "../API_PATH";
-import getProductListRequest from "../../types/api/dashboard/getProductListRequest";
+import getProductListRequest from "../../types/api/getProductListRequest";
 
 const getProductListHandler = async (request: getProductListRequest) => {
 	try {
