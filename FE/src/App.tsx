@@ -3,6 +3,7 @@ import ProductListPage from "./pages/Products/ProductListPage";
 import ProductDetailPage from "./pages/Products/ProductDetailPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import { AuthProvider } from "./context/AuthContext";
+import AddProductPage from "./pages/Products/AddProductPage";
 
 function App() {
 	return (
@@ -11,6 +12,7 @@ function App() {
 				<Routes>
 					<Route path="products" element={<ProductListPage />} />
 					<Route path="products/detail" element={<ProductDetailPage />} />
+					<Route path="products/add" element={<AddProductPage />} />
 					<Route path="dashboard" element={<DashboardPage />} />
 				</Routes>
 			</BrowserRouter>

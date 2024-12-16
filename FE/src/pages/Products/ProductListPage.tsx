@@ -4,9 +4,9 @@ import Navbar from "../../components/Navbar";
 import Button from "../../components/Button";
 import ProductItem from "../../components/ProductItem";
 import getProductListHandler from "../../api/dashboard/getProductListHandler";
-import getProductListRequest from "../../types/api/getProductListRequest";
+import getProductListRequest from "../../types/api/dashboard/getProductListRequest";
 import axios from "axios";
-import getProductListResult from "../../types/api/getProductListResult";
+import getProductListResult from "../../types/api/dashboard/getProductListResult";
 import { AuthContext } from "../../context/AuthContext";
 
 const ProductListPage = () => {
@@ -16,7 +16,7 @@ const ProductListPage = () => {
 
 	const authContext = useContext(AuthContext);
 
-	if (authContext == null || authContext?.user == null || authContext?.token == null) {
+	if (authContext == null || authContext?.user == null || authContext?.token == "token" || !authContext.isTokenValidHandler()) {
 		navigate("../auth/login");
 	}
 
@@ -56,7 +56,14 @@ const ProductListPage = () => {
 					<h1 className="text-4xl text-underline text-center md:text-right font-bold mt-8 underline"> Product List </h1>
 				</div>
 				<div className="w-full mt-8 md:w-2/5">
-					<Button text="Add Product" isPrimary={true} align="right" />
+					<Button
+						text="Add Product"
+						isPrimary={true}
+						align="right"
+						onClick={() => {
+							navigate("add");
+						}}
+					/>
 				</div>
 			</div>
 
