@@ -1,13 +1,9 @@
 import { createContext, ReactNode, useState } from "react";
 import AuthType from "../types/model/UserType";
-import getUserInformationHandler from "../api/auth/getUserInformationHandler";
-import axios from "axios";
-import { useNavigate } from "react-router";
 
 interface IAuthContext {
 	user: AuthType | null;
 	token: string | null;
-	isTokenValidHandler: () => {};
 }
 
 interface IAuthProvider {
@@ -24,22 +20,11 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 		role: 1,
 		companyId: 1,
 	});
-
-	const [token, setToken] = useState<string>(
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOjEsImNvbXBhbnlfaWQiOjEsImV4cCI6MTczNDMwNTUxN30.AAh-fZylNdRokwhSjE-GsB2nJLOR5wtJeZU8LLE939k"
+	const [token, setToken] = useState<string | null>(
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOjEsImNvbXBhbnlfaWQiOjEsImV4cCI6MTczNDI1NTg5MH0.I2IkpM19OHG0ayv3_sLYc0SKq2WYfQDNUt8BdzsD1CM"
 	);
 
-	const isTokenValidHandler = async (): Promise<boolean> => {
-		const response = await getUserInformationHandler({ token: token });
-
-		if (axios.isAxiosError(response)) {
-			return false;
-		} else {
-			return true;
-		}
-	};
-
-	return <AuthContext.Provider value={{ user, token, isTokenValidHandler }}>{children}</AuthContext.Provider>;
+	return <AuthContext.Provider value={{ user, token }}>{children}</AuthContext.Provider>;
 };
 
 export { AuthContext, AuthProvider };

@@ -3,15 +3,10 @@ import { useLocation } from "react-router";
 import InputType from "../types/components/InputType";
 
 const Input = (props: InputType) => {
-	let color = "text-black";
-	if (props.color == "white") {
-		color = "text-white";
-	}
-
 	if (props.type != "image") {
 		return (
 			<div className="flex flex-col">
-				<label className={"text-md font-semibold " + color} htmlFor={props.id}>
+				<label className="text-md font-semibold" htmlFor={props.id}>
 					{props.label}:
 				</label>
 				<input
@@ -21,7 +16,7 @@ const Input = (props: InputType) => {
 					type={props.type}
 					placeholder={props.placeholder}
 					onChange={props.onChange}
-					value={props.value}
+					ref={props.ref}
 				/>
 			</div>
 		);
@@ -49,28 +44,28 @@ const Input = (props: InputType) => {
 			}
 		};
 
-		let height = 8.5;
-		if (props.imageHeight != null) {
-			height = props.imageHeight;
-		}
-
-		let inputImageClass = `rounded-2xl h-[${height}rem] block mx-auto`;
-		let containerImageClass = `rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer h-[${height}rem]`;
-
 		return (
 			<div className="flex flex-col row-span-2">
-				<label className={"text-lg font-semibold " + color} htmlFor={props.id}>
+				<label className="text-lg font-semibold" htmlFor={props.id}>
 					{props.label}:
 				</label>
 				<div
-					className={containerImageClass}
+					className="rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer"
 					onClick={() => {
 						document.getElementById(props.id)?.click();
 					}}
 				>
-					<img src={productImage} className={inputImageClass} />
+					<img src={productImage} className="rounded-2xl h-[8.5rem] block mx-auto" />
 				</div>
-				<input className="hidden" id={props.id} name={props.name} type="file" accept=".png,.jpg,.jpeg" onChange={imageChangeHandler} />
+				<input
+					className="hidden"
+					id={props.id}
+					name={props.name}
+					type="file"
+					accept=".png,.jpg,.jpeg"
+					onChange={imageChangeHandler}
+					ref={props.ref}
+				/>
 			</div>
 		);
 	}

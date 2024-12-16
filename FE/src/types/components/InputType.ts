@@ -7,9 +7,8 @@ type InputType = {
 	width?: string;
 	isDisabled?: boolean;
 	value?: string | number;
-	onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	color?: "black" | "white";
-	imageHeight?: number;
+	ref?: React.Ref<HTMLInputElement>
+	onChange?: () => {};
 };
 
 export default InputType;

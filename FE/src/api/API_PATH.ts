@@ -1,2 +1,2 @@
-const API_PATH = "https://api.hydrosense.nextora.my.id";
+const API_PATH = "https://apihydrosense.localto.net";
 export default API_PATH;
