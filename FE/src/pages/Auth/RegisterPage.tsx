@@ -1,26 +1,114 @@
-import React from "react";
+import React, { useState } from "react";
+// import { Navigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
+
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
+    const navigate = useNavigate();
+    
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        setFormData({ ...formData, [id]: value });
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        setError('');
+        setSuccessMessage('');
+        
+        const { firstName, lastName, email, password, confirmPassword } = formData;
+
+        if (!firstName || !lastName || !email || !password || !confirmPassword) {
+            setError('Please fill in all fields.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+    
+        try {
+            setLoading(true);
+            const response = await fetch('https://api.hydrosense.nextora.my.id/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
+                    password: password
+                })
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+                setSuccessMessage(result.message);
+                setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
+                navigate("/");
+            } else {
+                setError(result.message || 'Something went wrong. Please try again.');
+            }
+        } catch (err) {
+            setError('Failed to register. Please check your network connection.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+
     return (
         <div className="flex items-center justify-center min-h-screen">
             <div className="bg-[#002B58] p-8 rounded-lg shadow-lg max-w-sm w-full">
                 <h2 className="text-3xl font-bold text-center text-white mb-6">Register</h2>
-                <form id="style-7" className="max-h-[400px] overflow-y-auto"> 
+
+
+                {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+                {successMessage && <p className="text-green-500 text-center mb-4">{successMessage}</p>}
+
+<form 
+                    id="style-7" 
+                    className="max-h-[400px] overflow-y-auto"
+                    onSubmit={handleSubmit}
+                > 
                     <div className="mb-2">
-                        <label htmlFor="FName" className="block text-lg text-white text-base">First Name</label>
+                        <label htmlFor="firstName" className="block text-lg text-white text-base">First Name</label>
                         <input
                             type="text"
-                            id="FName"
+                            id="firstName"
+                            value={formData.firstName}
+                            onChange={handleInputChange}
                             placeholder="Enter your First Name"
                             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
                     <div className="mb-2 mt-2">
-                        <label htmlFor="LName" className="block text-lg text-white text-base">Last Name</label>
+                        <label htmlFor="lastName" className="block text-lg text-white text-base">Last Name</label>
                         <input
                             type="text"
-                            id="LName"
+                            id="lastName"
+                            value={formData.lastName}
+                            onChange={handleInputChange}
                             placeholder="Enter your Last Name"
                             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
@@ -31,6 +119,8 @@ const RegisterPage = () => {
                         <input
                             type="email"
                             id="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
                             placeholder="Enter your email"
                             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
@@ -41,28 +131,37 @@ const RegisterPage = () => {
                         <input
                             type="password"
                             id="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
                             placeholder="Enter your password"
                             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
                     <div className="mb-2 mt-2">
-                        <label htmlFor="confirmPass" className="block text-lg text-white text-base"> Confirm Password</label>
+                        <label htmlFor="confirmPassword" className="block text-lg text-white text-base"> Confirm Password</label>
                         <input
                             type="password"
-                            id="confirmPass"
-                            placeholder="Enter your password"
+                            id="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handleInputChange}
+                            placeholder="Confirm your password"
                             className="w-full px-4 py-2 mt-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full mt-2 py-2 bg-white text-white text-[#002B58] font-semibold rounded-lg hover:bg-[#B6CDFF] focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        disabled={loading}
+                        className="w-full mt-2 py-2 bg-white text-[#002B58] font-semibold rounded-lg hover:bg-[#B6CDFF] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
-                        REGISTER
+                        {loading ? 'Registering...' : 'REGISTER'}
                     </button>
-                    <span className="text-sm text-[#BFCAD5]">Already have an account? <a href="#" className="text-indigo-600 hover:text-[#92DFF3]"> Login</a></span>
+
+                    <span className="text-sm text-[#BFCAD5]">
+                        Already have an account? 
+                        <a href="#" className="text-indigo-600 hover:text-[#92DFF3]"> Login</a>
+                    </span>
                 </form>
             </div>
 
