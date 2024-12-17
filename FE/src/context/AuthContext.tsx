@@ -26,16 +26,31 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 	});
 
 	const [token, setToken] = useState<string>(
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOjEsImNvbXBhbnlfaWQiOjEsImV4cCI6MTczNDMwNTUxN30.AAh-fZylNdRokwhSjE-GsB2nJLOR5wtJeZU8LLE939k"
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOjEsImNvbXBhbnlfaWQiOjEsImV4cCI6MTczNDQ2NTIyOH0.-moICagBy2wTY7Xd7eUUvSwg8dZF9eDB3c_Nl_cTso8"
 	);
 
 	const isTokenValidHandler = async (): Promise<boolean> => {
-		const response = await getUserInformationHandler({ token: token });
+		// return true;
+		// const response = await getUserInformationHandler({ token: token });
 
-		if (axios.isAxiosError(response)) {
+		// if (axios.isAxiosError(response)) {
+		// 	return false;
+		// } else {
+		// 	return true;
+		// }
+
+		try {
+			const response = await getUserInformationHandler({ token: token });
+	
+			if (axios.isAxiosError(response)) {
+				console.error("Token validation failed:", response.message);
+				return false; 
+			}
+	
+			return true; 
+		} catch (error) {
+			console.error("Error during token validation:", error);
 			return false;
-		} else {
-			return true;
 		}
 	};
 
