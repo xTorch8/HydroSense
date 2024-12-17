@@ -20,14 +20,7 @@ const ProductDetailPage = () => {
 		navigate("/products");
 	};
 
-	if (
-		id == undefined ||
-		name == undefined ||
-		image == undefined ||
-		authContext == null ||
-		authContext.token == "token" ||
-		authContext.isTokenValidHandler() == false
-	) {
+	if (id == undefined || name == undefined || image == undefined || authContext == null || authContext.token == "token") {
 		useEffect(() => {
 			navigateBackHandler();
 		});
@@ -146,7 +139,11 @@ const ProductDetailPage = () => {
 			</div>
 
 			<form onSubmit={submitHandler}>
-				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-4/5 mx-auto mt-8">
+				<div className="mt-8 mx-auto w-4/5">
+					<Input id="input-description" name="description" label="Description" type="text" />
+				</div>
+
+				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-4/5 mx-auto mt-2">
 					<Input label="pH" id="input-pH" name="pH" type="number" placeholder="7.2" value={formState.pH} onChange={formChangeHandler} color="black" />
 					<Input
 						label="Lead (mg/L)"
@@ -289,19 +286,19 @@ const ProductDetailPage = () => {
 						color="black"
 					/>
 				</div>
-
-				<div className="w-4/5 mx-auto flex flex-row justify-end space-x-4 mt-8">
-					<div>
-						<Button text="Check Water Quality" />
-					</div>
-					<div>
-						<Button text="Edit" isPrimary={false} />
-					</div>
-					<div>
-						<Button text="Delete" isPrimary={false} />
-					</div>
-				</div>
 			</form>
+
+			<div className="w-4/5 mx-auto flex flex-row justify-end space-x-4 mt-8">
+				<div>
+					<Button text="Check Water Quality" />
+				</div>
+				<div>
+					<Button text="Edit" isPrimary={false} />
+				</div>
+				<div>
+					<Button text="Delete" isPrimary={false} />
+				</div>
+			</div>
 
 			{error.length > 0 ? <p className="w-4/5 mx-auto pl-4 mt-8 text-black font-extrabold"> Error: </p> : <></>}
 
