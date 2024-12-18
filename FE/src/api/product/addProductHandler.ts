@@ -31,10 +31,10 @@ const addProductHandler = async (request: addProductRequest) => {
 
 		formData.append("water_data", waterData);
 
-		const response = await axios.post(`${API_PATH}/product/save`, formData, {
+		const response = await axios.post(`${API_PATH}/product/save/`, formData, {
 			headers: {
 				Authorization: `Bearer ${request.token}`,
-				// "Content-Type": "multipart/form-data",
+				"Content-Type": "multipart/form-data",
 			},
 		});
 
