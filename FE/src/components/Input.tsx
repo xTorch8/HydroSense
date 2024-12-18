@@ -9,6 +9,7 @@ const Input = (props: InputType) => {
 	}
 
 	if (props.type != "image") {
+		console.log(props.isDisabled ?? false);
 		return (
 			<div className="flex flex-col">
 				<label className={"text-md font-semibold " + color} htmlFor={props.id}>
@@ -22,6 +23,7 @@ const Input = (props: InputType) => {
 					placeholder={props.placeholder}
 					onChange={props.onChange}
 					value={props.value}
+					disabled={props.isDisabled ?? false}
 				/>
 			</div>
 		);
@@ -70,7 +72,15 @@ const Input = (props: InputType) => {
 				>
 					<img src={productImage} className={inputImageClass} />
 				</div>
-				<input className="hidden" id={props.id} name={props.name} type="file" accept=".png,.jpg,.jpeg" onChange={imageChangeHandler} />
+				<input
+					className="hidden"
+					id={props.id}
+					name={props.name}
+					type="file"
+					accept=".png,.jpg,.jpeg"
+					onChange={imageChangeHandler}
+					disabled={props.isDisabled ?? false}
+				/>
 			</div>
 		);
 	}

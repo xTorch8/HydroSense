@@ -82,6 +82,7 @@ const ProductListPage = () => {
 										id: item.product_id,
 										name: item.product_name,
 										image: item.product_image,
+										description: item.product_description,
 									},
 								});
 							}}

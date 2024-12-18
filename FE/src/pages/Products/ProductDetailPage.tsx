@@ -11,12 +11,14 @@ import getProductHistoryResult from "../../types/api/product/getProductHistoryRe
 import axios from "axios";
 import getProductHistoryHandler from "../../api/product/getProductHistoryHandler";
 import getProductHistoryRequest from "../../types/api/product/getProductHistoryRequest";
+import getProductLastComponentRequest from "../../types/api/product/getProductLastComponentRequest";
+import getProductLastComponentHandler from "../../api/product/getProductLastComponentHandler";
 
 const ProductDetailPage = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const { id, name, image } = location.state || {};
+	const { id, name, image, description } = location.state || {};
 
 	const authContext = useContext(AuthContext);
 
@@ -34,8 +36,32 @@ const ProductDetailPage = () => {
 
 	const [historyList, setHistoryList] = useState<getProductHistoryResult[]>([]);
 
+	const [isReadOnly, setIsReadOnly] = useState<boolean>(true);
+
+	const [formState, setFormState] = useState<IAddProductForm & { waterQuality: string }>({
+		productName: name,
+		productDescription: description,
+		productImage: image,
+		pH: 0,
+		lead: 0,
+		odor: 0,
+		totalDissolvedSolids: 0,
+		iron: 0,
+		turbidity: 0,
+		sulfate: 0,
+		nitrate: 0,
+		flouride: 0,
+		chlorine: 0,
+		chloride: 0,
+		copper: 0,
+		manganese: 0,
+		waterQuality: "",
+	});
+
 	useEffect(() => {
-		const fetchHistoryList = async () => {
+		let cleanPercentage = 0;
+
+		const fetchHistoryListHandler = async () => {
 			try {
 				const request: getProductHistoryRequest = {
 					productId: id,
@@ -52,7 +78,12 @@ const ProductDetailPage = () => {
 
 				let list: getProductHistoryResult[] = [];
 
+				let cleanCount = 0;
 				response.map((r: any) => {
+					if (r.WaterQualityName == "Clean") {
+						cleanCount += 1;
+					}
+
 					list.push({
 						date: r.Date,
 						productName: r.ProductName,
@@ -61,33 +92,55 @@ const ProductDetailPage = () => {
 					});
 				});
 
+				cleanPercentage = Math.floor((cleanCount / list.length) * 100);
 				setHistoryList(list);
 			} catch (e) {
 				setHistoryList([]);
 			}
 		};
 
-		fetchHistoryList();
-	}, []);
+		const fetchLastComponentHandler = async () => {
+			try {
+				const request: getProductLastComponentRequest = {
+					productId: id,
+					token: authContext.token ?? "token",
+				};
 
-	const [formState, setFormState] = useState<IAddProductForm>({
-		productName: "",
-		productDescription: "",
-		productImage: "",
-		pH: undefined,
-		lead: undefined,
-		odor: undefined,
-		totalDissolvedSolids: undefined,
-		iron: undefined,
-		turbidity: undefined,
-		sulfate: undefined,
-		nitrate: undefined,
-		flouride: undefined,
-		chlorine: undefined,
-		chloride: undefined,
-		copper: undefined,
-		manganese: undefined,
-	});
+				const response = await getProductLastComponentHandler(request);
+
+				if (axios.isAxiosError(response)) {
+					if (response.status == 401) {
+						navigate("../login");
+					}
+				}
+
+				const waterDataDetail = response.WaterDataDetail;
+
+				setFormState({
+					productName: name,
+					productDescription: description,
+					productImage: image,
+					pH: parseFloat(waterDataDetail.pH),
+					lead: parseFloat(waterDataDetail.Lead),
+					odor: parseFloat(waterDataDetail.Odor),
+					totalDissolvedSolids: parseFloat(waterDataDetail.total_dissolved_solids),
+					iron: parseFloat(waterDataDetail.Iron),
+					turbidity: parseFloat(waterDataDetail.Turbidity),
+					sulfate: parseFloat(waterDataDetail.Sulfate),
+					nitrate: parseFloat(waterDataDetail.Nitrate),
+					flouride: parseFloat(waterDataDetail.Fluoride),
+					chlorine: parseFloat(waterDataDetail.Chlorine),
+					chloride: parseFloat(waterDataDetail.Chloride),
+					copper: parseFloat(waterDataDetail.Copper),
+					manganese: parseFloat(waterDataDetail.Manganese),
+					waterQuality: `${cleanPercentage}% Clean`,
+				});
+			} catch (e) {}
+		};
+
+		fetchHistoryListHandler();
+		fetchLastComponentHandler();
+	}, []);
 
 	const formChangeHandler = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = event.target;
@@ -161,19 +214,38 @@ const ProductDetailPage = () => {
 
 			<form onSubmit={submitHandler}>
 				<div className="mt-8 mx-auto w-4/5">
-					<Input id="input-description" name="description" label="Description" type="text" />
+					<Input
+						id="input-description"
+						name="description"
+						label="Description"
+						placeholder="..."
+						type="text"
+						value={formState.productDescription}
+						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
+					/>
 				</div>
 
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-4 w-4/5 mx-auto mt-2">
-					<Input label="pH" id="input-pH" name="pH" type="number" placeholder="7.2" value={formState.pH} onChange={formChangeHandler} color="black" />
+					<Input
+						label="pH"
+						id="input-pH"
+						name="pH"
+						type="number"
+						placeholder="7.2"
+						value={formState.pH}
+						onChange={formChangeHandler}
+						color="black"
+						isDisabled={isReadOnly}
+					/>
 					<Input
 						label="Lead (mg/L)"
 						id="input-lead"
 						name="lead"
 						type="number"
-						placeholder="0.003"
 						value={formState.lead}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 						color="black"
 					/>
 					<Input
@@ -181,19 +253,19 @@ const ProductDetailPage = () => {
 						id="input-odor"
 						name="odor"
 						type="number"
-						placeholder=""
 						value={formState.odor}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 						color="black"
 					/>
 					<Input
 						label="Total Dissolved Solids (mg/L)"
 						id="input-tds"
-						name="total_dissolved_solids"
+						name="totalDissolvedSolids"
 						type="number"
-						placeholder="200"
 						color="black"
 						value={formState.totalDissolvedSolids}
+						isDisabled={isReadOnly}
 						onChange={formChangeHandler}
 					/>
 					<Input
@@ -201,9 +273,9 @@ const ProductDetailPage = () => {
 						id="input-iron"
 						name="iron"
 						type="number"
-						placeholder="0.15"
 						value={formState.iron}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 						color="black"
 					/>
 					<Input
@@ -211,9 +283,9 @@ const ProductDetailPage = () => {
 						id="input-turbidity"
 						name="turbidity"
 						type="number"
-						placeholder="0.5"
 						value={formState.turbidity}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 						color="black"
 					/>
 					<Input
@@ -221,51 +293,49 @@ const ProductDetailPage = () => {
 						id="input-lead"
 						name="lead"
 						type="number"
-						placeholder="25"
 						value={formState.sulfate}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 						color="black"
 					/>
 					<Input
-						label="Sulfate (mg/L)"
-						id="input-lead"
-						name="lead"
-						type="number"
-						placeholder="66%"
-						value={formState.sulfate}
+						label="Water Quality"
+						id="input-water-quality"
+						name="water-quality"
+						type="text"
+						value={formState.waterQuality}
 						color="black"
 						isDisabled={true}
+						onChange={formChangeHandler}
 					/>
-
 					<Input
 						label="Nitrate (mg/L)"
 						id="input-nitrate"
 						name="nitrate"
 						type="number"
-						placeholder="3.0"
 						value={formState.nitrate}
 						onChange={formChangeHandler}
 						color="black"
+						isDisabled={isReadOnly}
 					/>
 					<Input
 						label="Flouride (mg/L)"
 						id="input-flouride"
 						name="flouride"
 						type="number"
-						placeholder="0.7"
 						value={formState.flouride}
 						onChange={formChangeHandler}
 						color="black"
+						isDisabled={isReadOnly}
 					/>
 					<Input
 						label="Chlorine (mg/L)"
 						id="input-chlorine"
 						name="chlorine"
 						type="number"
-						placeholder="0.5"
 						value={formState.chlorine}
 						onChange={formChangeHandler}
-						color="black"
+						isDisabled={isReadOnly}
 					/>
 					<Input
 						id="input-image"
@@ -273,16 +343,17 @@ const ProductDetailPage = () => {
 						label="Image (Opsional)"
 						type="image"
 						color="black"
-						// value={formState.productImage}
+						value={formState.productImage}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 					/>
 					<Input
 						label="Chloride (mg/L)"
 						id="input-chloride"
 						name="flouride"
 						type="number"
-						placeholder="20"
 						value={formState.chloride}
+						isDisabled={isReadOnly}
 						onChange={formChangeHandler}
 						color="black"
 					/>
@@ -291,9 +362,9 @@ const ProductDetailPage = () => {
 						id="input-copper"
 						name="copper"
 						type="number"
-						placeholder="0.1"
 						value={formState.copper}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 						color="black"
 					/>
 					<Input
@@ -301,9 +372,9 @@ const ProductDetailPage = () => {
 						id="input-manganese"
 						name="manganese"
 						type="number"
-						placeholder="0.05"
 						value={formState.manganese}
 						onChange={formChangeHandler}
+						isDisabled={isReadOnly}
 						color="black"
 					/>
 				</div>
