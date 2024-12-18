@@ -20,7 +20,7 @@ const ProductDetailPage = () => {
 		navigate("/products");
 	};
 
-	if (id == undefined || name == undefined || image == undefined || authContext == null || authContext.token == "token") {
+	if (id == undefined || name == undefined || image == undefined || authContext == null || authContext.isTokenValidHandler() == false) {
 		useEffect(() => {
 			navigateBackHandler();
 		});

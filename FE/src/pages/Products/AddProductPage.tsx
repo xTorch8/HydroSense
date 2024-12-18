@@ -14,8 +14,8 @@ const AddProductPage = () => {
 
 	const navigate = useNavigate();
 
-	if (authContext == null || authContext?.user == null || authContext?.token == "token") {
-		navigate("../auth/login");
+	if (authContext == null) {
+		navigate("../login");
 	}
 
 	const pageStyle = {
@@ -318,7 +318,7 @@ const AddProductPage = () => {
 
 			if (axios.isAxiosError(response)) {
 				if (response.status === 401) {
-					navigate("../auth/login");
+					navigate("../login");
 				} else {
 					setError([response.message]);
 				}

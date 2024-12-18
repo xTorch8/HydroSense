@@ -2,11 +2,12 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import AuthType from "../types/model/UserType";
 import getUserInformationHandler from "../api/auth/getUserInformationHandler";
 import axios from "axios";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 
 interface IAuthContext {
 	user: AuthType | null;
 	token: string | null;
+	updateTokenHandler: (jwt: string) => void;
 	isTokenValidHandler: () => {};
 }
 
@@ -17,50 +18,72 @@ interface IAuthProvider {
 const AuthContext = createContext<IAuthContext | null>(null);
 
 const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
-	const [user, setUser] = useState<AuthType | null>({
-		firstName: "John",
-		lastName: "Doe",
-		email: "john.doe@example.com",
-		role: 1,
-		companyId: 1,
-	});
+	const [user, setUser] = useState<AuthType | null>(null);
 
-	const [token, setToken] = useState<string>(
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOjEsImNvbXBhbnlfaWQiOjEsImV4cCI6MTczNDQ3NzEwNX0.8pMSVhdgFaDbINR_HmOYlygbT5Y5mQ-P1rgbTEgwGS4"
-	);
+	const [token, setToken] = useState<string>("token");
 
 	const isTokenValidHandler = async (): Promise<boolean> => {
-		// return true;
-		// const response = await getUserInformationHandler({ token: token });
-
-		// if (axios.isAxiosError(response)) {
-		// 	return false;
-		// } else {
-		// 	return true;
-		// }
-
 		try {
 			const response = await getUserInformationHandler({ token: token });
-	
+
 			if (axios.isAxiosError(response)) {
 				console.error("Token validation failed:", response.message);
-				return false; 
+				return false;
 			}
-	
-			return true; 
+
+			setUser({
+				firstName: response.first_name,
+				lastName: response.last_name,
+				email: response.email,
+				role: response.role,
+				companyId: response.company_id,
+			});
+
+			return true;
 		} catch (error) {
 			console.error("Error during token validation:", error);
+
+			setUser(null);
+
 			return false;
 		}
 	};
 
-	useEffect(() => {
-		if (user == null) {
-			setToken("token");
-		}
-	}, [user]);
+	const updateTokenHandler = (jwt: string): void => {
+		setToken(jwt);
+	};
 
-	return <AuthContext.Provider value={{ user, token, isTokenValidHandler }}>{children}</AuthContext.Provider>;
+	const updateUserHandler = async (): Promise<void> => {
+		try {
+			const response = await getUserInformationHandler({ token: token });
+
+			if (axios.isAxiosError(response)) {
+				setUser(null);
+			}
+
+			setUser({
+				firstName: response.first_name,
+				lastName: response.last_name,
+				email: response.email,
+				role: response.role,
+				companyId: response.company_id,
+			});
+		} catch (error) {
+			setUser(null);
+		}
+	};
+
+	useEffect(() => {
+		const main = async () => {
+			await updateUserHandler();
+		};
+
+		main();
+	}, [token]);
+
+	console.log(token, user);
+
+	return <AuthContext.Provider value={{ user, token, updateTokenHandler, isTokenValidHandler }}>{children}</AuthContext.Provider>;
 };
 
 export { AuthContext, AuthProvider };

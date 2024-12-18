@@ -16,8 +16,8 @@ const ProductListPage = () => {
 
 	const authContext = useContext(AuthContext);
 
-	if (authContext == null || authContext?.user == null || authContext?.token == "token") {
-		navigate("../auth/login");
+	if (authContext == null || authContext.isTokenValidHandler() == false) {
+		navigate("../login");
 	}
 
 	useEffect(() => {
@@ -32,7 +32,7 @@ const ProductListPage = () => {
 
 				if (axios.isAxiosError(response)) {
 					if (response.status === 401) {
-						navigate("../auth/login");
+						navigate("../login");
 					} else {
 						console.log(response.status);
 					}
