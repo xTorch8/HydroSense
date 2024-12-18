@@ -12,6 +12,7 @@ export default {
 				gold: "#FCD324",
 				silver: "#D9E0D2",
 				bronze: "#F4AA6B",
+				color4: "#445EF2",
 			},
 			fontFamily: {
 				quicksand: ["Quicksand", "sansserif"],
