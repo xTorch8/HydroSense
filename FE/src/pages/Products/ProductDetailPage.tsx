@@ -7,6 +7,10 @@ import Input from "../../components/Input";
 import HistoryItem from "../../components/HistoryItem";
 import { AuthContext } from "../../context/AuthContext";
 import IAddProductForm from "../../types/model/IAddProductForm";
+import getProductHistoryResult from "../../types/api/product/getProductHistoryResult";
+import axios from "axios";
+import getProductHistoryHandler from "../../api/product/getProductHistoryHandler";
+import getProductHistoryRequest from "../../types/api/product/getProductHistoryRequest";
 
 const ProductDetailPage = () => {
 	const navigate = useNavigate();
@@ -28,26 +32,43 @@ const ProductDetailPage = () => {
 		return null;
 	}
 
-	const dummyHistoryList = [
-		{
-			id: 1,
-			time: "08.30 PM",
-			date: "2024-09-30",
-			isClean: true,
-		},
-		{
-			id: 2,
-			time: "06.28 AM",
-			date: "2024-09-18",
-			isClean: false,
-		},
-		{
-			id: 3,
-			time: "02.20 PM",
-			date: "2024-09-05",
-			isClean: true,
-		},
-	];
+	const [historyList, setHistoryList] = useState<getProductHistoryResult[]>([]);
+
+	useEffect(() => {
+		const fetchHistoryList = async () => {
+			try {
+				const request: getProductHistoryRequest = {
+					productId: id,
+					token: authContext.token ?? "token",
+				};
+
+				const response = await getProductHistoryHandler(request);
+
+				if (axios.isAxiosError(response)) {
+					if (response.status == 401) {
+						navigate("../login");
+					}
+				}
+
+				let list: getProductHistoryResult[] = [];
+
+				response.map((r: any) => {
+					list.push({
+						date: r.Date,
+						productName: r.ProductName,
+						productId: r.ProductID,
+						isClean: r.WaterQualityName == "Clean",
+					});
+				});
+
+				setHistoryList(list);
+			} catch (e) {
+				setHistoryList([]);
+			}
+		};
+
+		fetchHistoryList();
+	}, []);
 
 	const [formState, setFormState] = useState<IAddProductForm>({
 		productName: "",
@@ -313,8 +334,16 @@ const ProductDetailPage = () => {
 			<h1 className="text-4xl text-underline text-center font-bold mt-12 underline"> Product History </h1>
 
 			<div className="w-4/5 mx-auto my-8">
-				{dummyHistoryList.map((item) => {
-					return <HistoryItem isClean={item.isClean} time={item.time} date={item.date} name={name} key={item.id} />;
+				{historyList.map((item) => {
+					return (
+						<HistoryItem
+							isClean={item.isClean}
+							time={item.date.split("T")[1]}
+							date={item.date.split("T")[0]}
+							name={name}
+							key={`${item.productId} - ${item.date}`}
+						/>
+					);
 				})}
 			</div>
 		</>
