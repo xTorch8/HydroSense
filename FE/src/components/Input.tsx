@@ -49,13 +49,13 @@ const Input = (props: InputType) => {
 			}
 		};
 
-		let height = 8.5;
+		let height = "h-[8.5rem]";
 		if (props.imageHeight != null) {
-			height = props.imageHeight;
+			height = `h-[${props.imageHeight}rem]`;
 		}
 
-		let inputImageClass = `rounded-2xl h-[${height}rem] block mx-auto`;
-		let containerImageClass = `rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer h-[${height}rem]`;
+		let inputImageClass = `rounded-2xl ${height} block mx-auto`;
+		let containerImageClass = `rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer ${height}`;
 
 		return (
 			<div className="flex flex-col row-span-2">
