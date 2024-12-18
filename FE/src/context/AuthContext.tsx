@@ -2,6 +2,7 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import AuthType from "../types/model/UserType";
 import getUserInformationHandler from "../api/auth/getUserInformationHandler";
 import axios from "axios";
+import { useNavigate } from "react-router";
 // import { useNavigate } from "react-router";
 
 interface IAuthContext {
@@ -20,7 +21,7 @@ const AuthContext = createContext<IAuthContext | null>(null);
 const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 	const [user, setUser] = useState<AuthType | null>(null);
 
-	const [token, setToken] = useState<string>("token");
+	const [token, setToken] = useState<string>(localStorage.getItem("token") ?? "token");
 
 	const isTokenValidHandler = async (): Promise<boolean> => {
 		try {
@@ -69,6 +70,7 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 				companyId: response.company_id,
 			});
 		} catch (error) {
+			// navigate("../login");
 			setUser(null);
 		}
 	};
@@ -80,8 +82,6 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 
 		main();
 	}, [token]);
-
-	console.log(token, user);
 
 	return <AuthContext.Provider value={{ user, token, updateTokenHandler, isTokenValidHandler }}>{children}</AuthContext.Provider>;
 };

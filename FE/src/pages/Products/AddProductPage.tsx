@@ -8,6 +8,7 @@ import IAddProductForm from "../../types/model/IAddProductForm";
 import addProductRequest from "../../types/api/product/addProductRequest";
 import addProductHandler from "../../api/product/addProductHandler";
 import axios from "axios";
+import convertBlobUrlToBase64Handler from "../../utils/convertBlobToBase64Handler";
 
 const AddProductPage = () => {
 	const authContext = useContext(AuthContext);
@@ -45,12 +46,24 @@ const AddProductPage = () => {
 	});
 
 	const formChangeHandler = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { name, value } = event.target;
+		const { name } = event.target;
 
-		setFormState((prevState) => ({
-			...prevState,
-			[name]: value,
-		}));
+		if (name === "image" && event.target instanceof HTMLInputElement && event.target.files) {
+			const file = event.target.files[0];
+			if (file) {
+				const imageUrl = URL.createObjectURL(file);
+				setFormState((prevState) => ({
+					...prevState,
+					productImage: imageUrl,
+				}));
+			}
+		} else {
+			const { value } = event.target;
+			setFormState((prevState) => ({
+				...prevState,
+				[name]: value,
+			}));
+		}
 	};
 
 	const step1 = (
@@ -79,16 +92,20 @@ const AddProductPage = () => {
 					/>
 				</div>
 				<div className="w-full md:w-1/2 mx-4 mt-4 md:mt-0">
-					<Input
-						id="input-image"
-						name="productImage"
-						label="Image (Opsional)"
-						type="image"
-						color="white"
-						imageHeight={21}
-						// value={formState.productImage}
-						onChange={formChangeHandler}
-					/>
+					<div className="flex flex-col row-span-2">
+						<label className="text-lg font-semibold text-white" htmlFor="input-image">
+							Image (Opsional)
+						</label>
+						<div
+							className="rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer h-[21rem]"
+							onClick={() => {
+								document.getElementById("input-image")?.click();
+							}}
+						>
+							<img src={formState.productImage} className="rounded-2xl h-[21rem] block mx-auto" />
+						</div>
+						<input className="hidden" id="input-image" name="image" type="file" accept=".png,.jpg,.jpeg" onChange={formChangeHandler} />
+					</div>
 				</div>
 			</div>
 		</>
@@ -295,7 +312,7 @@ const AddProductPage = () => {
 			const request: addProductRequest = {
 				name: formState.productName,
 				description: formState.productDescription,
-				image: formState.productImage,
+				image: await convertBlobUrlToBase64Handler(formState.productImage),
 				waterData: {
 					pH: formState.pH !== undefined ? parseFloat(formState.pH.toString()) : 0,
 					lead: formState.lead !== undefined ? parseFloat(formState.lead.toString()) : 0,

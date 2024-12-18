@@ -21,7 +21,7 @@ const LoginPage = () => {
 			});
 
 			const { access_token } = response.data;
-			// localStorage.setItem("token", access_token);
+			localStorage.setItem("token", access_token);
 			// setToken(access_token);
 
 			authContext?.updateTokenHandler(access_token);

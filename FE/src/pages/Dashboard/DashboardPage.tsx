@@ -132,9 +132,8 @@ const DashboardPage = () => {
 
 								const medal = index === 0 ? goldMedal : index === 1 ? silverMedal : index === 2 ? bronzeMedal : null;
 
-								console.log(blockColor);
 								return (
-									<div key={company.company_id} className={blockColor} onClick={() => toggleCompanyProducts(company.company_id)}>
+									<div key={`c-${company.company_id}`} className={blockColor} onClick={() => toggleCompanyProducts(company.company_id)}>
 										<div className="flex items-center justify-between">
 											<div className="flex items-center space-x-4">
 												{/* Icon Ranking */}
@@ -161,7 +160,7 @@ const DashboardPage = () => {
 										{expandedCompany === company.company_id && (
 											<div className="mt-2 bg-blue-100 rounded-lg p-2">
 												{companyProducts[company.company_id]?.map((product) => (
-													<div key={product.product_id} className="flex justify-between items-center px-2">
+													<div key={`p-${product.product_id}`} className="flex justify-between items-center px-2">
 														<span className="text-darkblue font-semibold">{product.product_name}</span>
 														<span className="text-darkblue font-semibold">{product.result}</span>
 													</div>
@@ -189,7 +188,7 @@ const DashboardPage = () => {
 				<table className="w-full border-collapse border text-white bg-darkblue size-16 font-semibold">
 					<tbody>
 						{history.map((item) => (
-							<tr key={item.product_id} className="border-b text-center text-lg">
+							<tr key={`H-${item.product_id}-${item.date}-${item.time}`} className="border-b text-center text-lg">
 								<td className="text-center">
 									<img src={item.result === "Clean" ? correctIcon : wrongIcon} alt={item.result} className="w-6 h-6 inline-block" />
 								</td>

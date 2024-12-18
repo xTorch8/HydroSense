@@ -16,7 +16,7 @@ const ProductListPage = () => {
 
 	const authContext = useContext(AuthContext);
 
-	if (authContext == null || authContext.isTokenValidHandler() == false) {
+	if (authContext == null) {
 		navigate("../login");
 	}
 
