@@ -4,7 +4,7 @@ import IRequest from "../IRequest";
 type addProductRequest = IRequest & {
     name: string;
     description: string;
-    image?: string;
+    image?: File;
     waterData: IProductDetailForm;
 };
 

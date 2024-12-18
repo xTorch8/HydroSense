@@ -9,6 +9,7 @@ import addProductRequest from "../../types/api/product/addProductRequest";
 import addProductHandler from "../../api/product/addProductHandler";
 import axios from "axios";
 import convertBlobUrlToBase64Handler from "../../utils/convertBlobToBase64Handler";
+import convertBlobToFileHandler from "../../utils/convertBlobToFileHandler";
 
 const AddProductPage = () => {
 	const authContext = useContext(AuthContext);
@@ -312,7 +313,7 @@ const AddProductPage = () => {
 			const request: addProductRequest = {
 				name: formState.productName,
 				description: formState.productDescription,
-				image: await convertBlobUrlToBase64Handler(formState.productImage),
+				image: await convertBlobToFileHandler(formState.productImage),
 				waterData: {
 					pH: formState.pH !== undefined ? parseFloat(formState.pH.toString()) : 0,
 					lead: formState.lead !== undefined ? parseFloat(formState.lead.toString()) : 0,
