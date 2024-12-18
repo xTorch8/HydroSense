@@ -1,4 +1,4 @@
-import CardsType from "../types/CardsType";
+import CardsType from "../types/components/CardsType";
 
 const Cards = (props: CardsType) => {
 	return (

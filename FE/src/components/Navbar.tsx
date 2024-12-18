@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import NavbarType from "../types/NavbarType";
+import NavbarType from "../types/components/NavbarType";
 import logo from "../assets/logo.png";
 
 const Navbar = (props: NavbarType) => {

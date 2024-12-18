@@ -1,4 +1,4 @@
-import ButtonTypes from "../types/ButtonType";
+import ButtonTypes from "../types/components/ButtonType";
 
 const Button = (props: ButtonTypes) => {
 	let align = "mx-auto ";
