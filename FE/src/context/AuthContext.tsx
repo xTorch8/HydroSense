@@ -30,13 +30,27 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 	);
 
 	const isTokenValidHandler = async (): Promise<boolean> => {
-		const response = await getUserInformationHandler({ token: token });
+		// return true;
+		// const response = await getUserInformationHandler({ token: token });
 
-		if (axios.isAxiosError(response)) {
+		// if (axios.isAxiosError(response)) {
+		// 	return false;
+		// } else {
+		// 	return true;
+		// }
+
+		try {
+			const response = await getUserInformationHandler({ token: token });
+	
+			if (axios.isAxiosError(response)) {
+				console.error("Token validation failed:", response.message);
+				return false; 
+			}
+	
+			return true; 
+		} catch (error) {
+			console.error("Error during token validation:", error);
 			return false;
-		} else {
-			setUser(null);
-			return true;
 		}
 	};
 
