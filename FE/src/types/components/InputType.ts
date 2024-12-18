@@ -6,7 +6,10 @@ type InputType = {
 	placeholder?: string;
 	width?: string;
 	isDisabled?: boolean;
-	onChange?: () => {};
+	value?: string | number;
+	onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	color?: "black" | "white";
+	imageHeight?: number;
 };
 
 export default InputType;
