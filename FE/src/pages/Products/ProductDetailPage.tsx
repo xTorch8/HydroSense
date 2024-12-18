@@ -13,6 +13,8 @@ import getProductHistoryHandler from "../../api/product/getProductHistoryHandler
 import getProductHistoryRequest from "../../types/api/product/getProductHistoryRequest";
 import getProductLastComponentRequest from "../../types/api/product/getProductLastComponentRequest";
 import getProductLastComponentHandler from "../../api/product/getProductLastComponentHandler";
+import deleteProductRequest from "../../types/api/product/deleteProductRequest";
+import deleteProductHandler from "../../api/product/deleteProductHandler";
 
 const ProductDetailPage = () => {
 	const navigate = useNavigate();
@@ -58,86 +60,88 @@ const ProductDetailPage = () => {
 		waterQuality: "",
 	});
 
-	useEffect(() => {
-		let cleanPercentage = 0;
+	let cleanPercentage = 0;
 
-		const fetchHistoryListHandler = async () => {
-			try {
-				const request: getProductHistoryRequest = {
-					productId: id,
-					token: authContext.token ?? "token",
-				};
+	const fetchHistoryListHandler = async () => {
+		try {
+			const request: getProductHistoryRequest = {
+				productId: id,
+				token: authContext.token ?? "token",
+			};
 
-				const response = await getProductHistoryHandler(request);
+			const response = await getProductHistoryHandler(request);
 
-				if (axios.isAxiosError(response)) {
-					if (response.status == 401) {
-						navigate("../login");
-					}
+			if (axios.isAxiosError(response)) {
+				if (response.status == 401) {
+					navigate("../login");
 				}
-
-				let list: getProductHistoryResult[] = [];
-
-				let cleanCount = 0;
-				response.map((r: any) => {
-					if (r.WaterQualityName == "Clean") {
-						cleanCount += 1;
-					}
-
-					list.push({
-						date: r.Date,
-						productName: r.ProductName,
-						productId: r.ProductID,
-						isClean: r.WaterQualityName == "Clean",
-					});
-				});
-
-				cleanPercentage = Math.floor((cleanCount / list.length) * 100);
-				setHistoryList(list);
-			} catch (e) {
-				setHistoryList([]);
 			}
-		};
 
-		const fetchLastComponentHandler = async () => {
-			try {
-				const request: getProductLastComponentRequest = {
-					productId: id,
-					token: authContext.token ?? "token",
-				};
+			let list: getProductHistoryResult[] = [];
 
-				const response = await getProductLastComponentHandler(request);
-
-				if (axios.isAxiosError(response)) {
-					if (response.status == 401) {
-						navigate("../login");
-					}
+			let cleanCount = 0;
+			response.map((r: any) => {
+				if (r.WaterQualityName == "Clean") {
+					cleanCount += 1;
 				}
 
-				const waterDataDetail = response.WaterDataDetail;
-
-				setFormState({
-					productName: name,
-					productDescription: description,
-					productImage: image,
-					pH: parseFloat(waterDataDetail.pH),
-					lead: parseFloat(waterDataDetail.Lead),
-					odor: parseFloat(waterDataDetail.Odor),
-					totalDissolvedSolids: parseFloat(waterDataDetail.total_dissolved_solids),
-					iron: parseFloat(waterDataDetail.Iron),
-					turbidity: parseFloat(waterDataDetail.Turbidity),
-					sulfate: parseFloat(waterDataDetail.Sulfate),
-					nitrate: parseFloat(waterDataDetail.Nitrate),
-					flouride: parseFloat(waterDataDetail.Fluoride),
-					chlorine: parseFloat(waterDataDetail.Chlorine),
-					chloride: parseFloat(waterDataDetail.Chloride),
-					copper: parseFloat(waterDataDetail.Copper),
-					manganese: parseFloat(waterDataDetail.Manganese),
-					waterQuality: `${cleanPercentage}% Clean`,
+				list.push({
+					date: r.Date,
+					productName: r.ProductName,
+					productId: r.ProductID,
+					isClean: r.WaterQualityName == "Clean",
 				});
-			} catch (e) {}
-		};
+			});
 
+			cleanPercentage = Math.floor((cleanCount / list.length) * 100);
+			setHistoryList(list);
+		} catch (e) {
+			setHistoryList([]);
+		}
+	};
+
+	const fetchLastComponentHandler = async () => {
+		try {
+			const request: getProductLastComponentRequest = {
+				productId: id,
+				token: authContext.token ?? "token",
+			};
+
+			const response = await getProductLastComponentHandler(request);
+
+			if (axios.isAxiosError(response)) {
+				if (response.status == 401) {
+					navigate("../login");
+				}
+			}
+
+			const waterDataDetail = response.WaterDataDetail;
+
+			setFormState({
+				productName: name,
+				productDescription: description,
+				productImage: image,
+				pH: parseFloat(waterDataDetail.pH),
+				lead: parseFloat(waterDataDetail.Lead),
+				odor: parseFloat(waterDataDetail.Odor),
+				totalDissolvedSolids: parseFloat(waterDataDetail.total_dissolved_solids),
+				iron: parseFloat(waterDataDetail.Iron),
+				turbidity: parseFloat(waterDataDetail.Turbidity),
+				sulfate: parseFloat(waterDataDetail.Sulfate),
+				nitrate: parseFloat(waterDataDetail.Nitrate),
+				flouride: parseFloat(waterDataDetail.Fluoride),
+				chlorine: parseFloat(waterDataDetail.Chlorine),
+				chloride: parseFloat(waterDataDetail.Chloride),
+				copper: parseFloat(waterDataDetail.Copper),
+				manganese: parseFloat(waterDataDetail.Manganese),
+				waterQuality: `${cleanPercentage}% Clean`,
+			});
+
+			setIsReadOnly(true);
+		} catch (e) {}
+	};
+
+	useEffect(() => {
 		fetchHistoryListHandler();
 		fetchLastComponentHandler();
 	}, []);
@@ -196,6 +200,28 @@ const ProductDetailPage = () => {
 		if (errorList.length == 0) {
 		} else {
 			setError(errorList);
+		}
+	};
+
+	const deleteHandler = async () => {
+		if (confirm("Are you sure want to delete this product? This action is irreversible!")) {
+			const request: deleteProductRequest = {
+				productId: id,
+				token: authContext.token ?? "token",
+			};
+
+			const response = await deleteProductHandler(request);
+
+			if (axios.isAxiosError(response)) {
+				alert("Delete product failed! " + response.message);
+
+				if (response.status == 401) {
+					navigate("../login");
+				}
+			} else {
+				alert("Delete product success!");
+				navigate("../products");
+			}
 		}
 	};
 
@@ -381,15 +407,46 @@ const ProductDetailPage = () => {
 			</form>
 
 			<div className="w-4/5 mx-auto flex flex-row justify-end space-x-4 mt-8">
-				<div>
-					<Button text="Check Water Quality" />
-				</div>
-				<div>
-					<Button text="Edit" isPrimary={false} />
-				</div>
-				<div>
-					<Button text="Delete" isPrimary={false} />
-				</div>
+				{isReadOnly ? (
+					<>
+						<div>
+							<Button text="Check Water Quality" />
+						</div>
+						<div>
+							<Button
+								text="Edit"
+								isPrimary={false}
+								onClick={() => {
+									setIsReadOnly(false);
+								}}
+							/>
+						</div>
+						<div>
+							<Button text="Delete" isPrimary={false} onClick={deleteHandler} />
+						</div>
+					</>
+				) : (
+					<>
+						<div>
+							<Button
+								text="Cancel"
+								isPrimary={true}
+								onClick={async () => {
+									await fetchLastComponentHandler();
+								}}
+							/>
+						</div>
+						<div>
+							<Button
+								text="Confirm"
+								isPrimary={false}
+								onClick={() => {
+									setIsReadOnly(true);
+								}}
+							/>
+						</div>
+					</>
+				)}
 			</div>
 
 			{error.length > 0 ? <p className="w-4/5 mx-auto pl-4 mt-8 text-black font-extrabold"> Error: </p> : <></>}
