@@ -5,13 +5,16 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import TextArea from "../../components/TextArea";
 import IAddProductForm from "../../types/model/IAddProductForm";
+import addProductRequest from "../../types/api/product/addProductRequest";
+import addProductHandler from "../../api/product/addProductHandler";
+import axios from "axios";
 
 const AddProductPage = () => {
 	const authContext = useContext(AuthContext);
 
 	const navigate = useNavigate();
 
-	if (authContext == null || authContext?.user == null || authContext?.token == "token" || authContext.isTokenValidHandler() == false) {
+	if (authContext == null || authContext?.user == null || authContext?.token == "token") {
 		navigate("../auth/login");
 	}
 
@@ -26,19 +29,19 @@ const AddProductPage = () => {
 		productName: "",
 		productDescription: "",
 		productImage: "",
-		pH: undefined,
-		lead: undefined,
-		odor: undefined,
-		totalDissolvedSolids: undefined,
-		iron: undefined,
-		turbidity: undefined,
-		sulfate: undefined,
-		nitrate: undefined,
-		flouride: undefined,
-		chlorine: undefined,
-		chloride: undefined,
-		copper: undefined,
-		manganese: undefined,
+		pH: 0,
+		lead: 0,
+		odor: 0,
+		totalDissolvedSolids: 0,
+		iron: 0,
+		turbidity: 0,
+		sulfate: 0,
+		nitrate: 0,
+		flouride: 0,
+		chlorine: 0,
+		chloride: 0,
+		copper: 0,
+		manganese: 0,
 	});
 
 	const formChangeHandler = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -147,8 +150,8 @@ const AddProductPage = () => {
 				/>
 				<Input
 					label="Sulfate (mg/L)"
-					id="input-lead"
-					name="lead"
+					id="input-sulfate"
+					name="sulfate"
 					type="number"
 					placeholder="25"
 					value={formState.sulfate}
@@ -188,7 +191,7 @@ const AddProductPage = () => {
 				<Input
 					label="Chloride (mg/L)"
 					id="input-chloride"
-					name="flouride"
+					name="chloride"
 					type="number"
 					placeholder="20"
 					value={formState.chloride}
@@ -255,13 +258,11 @@ const AddProductPage = () => {
 				nitrate: [0, 73],
 				chloride: [34, 1321],
 				lead: [0, 3.5],
-				zinc: [0, 24],
 				turbidity: [0, 18],
-				fluoride: [0, 12],
+				flouride: [0, 12],
 				copper: [0, 11],
 				odor: [0, 4],
 				sulfate: [12, 1393],
-				conductivity: [13, 1891],
 				chlorine: [1, 10],
 				manganese: [1, 23],
 				totalDissolvedSolids: [0, 579],
@@ -271,7 +272,7 @@ const AddProductPage = () => {
 				if (formState[name as keyof typeof formState] != undefined) {
 					const value = formState[name as keyof typeof formState];
 
-					if (value != undefined && typeof value == "string") {
+					if (value != undefined) {
 						if (+value < range[0] || +value > range[1]) {
 							errorList.push(`${name} must be between ${range[0]} and ${range[1]}!`);
 						}
@@ -291,6 +292,39 @@ const AddProductPage = () => {
 
 	const submitFormHandler = async () => {
 		try {
+			const request: addProductRequest = {
+				name: formState.productName,
+				description: formState.productDescription,
+				image: formState.productImage,
+				waterData: {
+					pH: formState.pH !== undefined ? parseFloat(formState.pH.toString()) : 0,
+					lead: formState.lead !== undefined ? parseFloat(formState.lead.toString()) : 0,
+					odor: formState.odor !== undefined ? parseFloat(formState.odor.toString()) : 0,
+					totalDissolvedSolids: formState.totalDissolvedSolids !== undefined ? parseFloat(formState.totalDissolvedSolids.toString()) : 0,
+					iron: formState.iron !== undefined ? parseFloat(formState.iron.toString()) : 0,
+					turbidity: formState.turbidity !== undefined ? parseFloat(formState.turbidity.toString()) : 0,
+					sulfate: formState.sulfate !== undefined ? parseFloat(formState.sulfate.toString()) : 0,
+					nitrate: formState.nitrate !== undefined ? parseFloat(formState.nitrate.toString()) : 0,
+					flouride: formState.flouride !== undefined ? parseFloat(formState.flouride.toString()) : 0,
+					chlorine: formState.chlorine !== undefined ? parseFloat(formState.chlorine.toString()) : 0,
+					chloride: formState.chloride !== undefined ? parseFloat(formState.chloride.toString()) : 0,
+					copper: formState.copper !== undefined ? parseFloat(formState.copper.toString()) : 0,
+					manganese: formState.manganese !== undefined ? parseFloat(formState.manganese.toString()) : 0,
+				},
+				token: authContext?.token ?? "token",
+			};
+
+			const response = await addProductHandler(request);
+
+			if (axios.isAxiosError(response)) {
+				if (response.status === 401) {
+					navigate("../auth/login");
+				} else {
+					setError([response.message]);
+				}
+			} else {
+				console.log("Success");
+			}
 		} catch (e) {
 			setError(["Internal server error"]);
 		}

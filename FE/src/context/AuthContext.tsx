@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import AuthType from "../types/model/UserType";
 import getUserInformationHandler from "../api/auth/getUserInformationHandler";
 import axios from "axios";
@@ -26,7 +26,7 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 	});
 
 	const [token, setToken] = useState<string>(
-		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOjEsImNvbXBhbnlfaWQiOjEsImV4cCI6MTczNDQ2NTIyOH0.-moICagBy2wTY7Xd7eUUvSwg8dZF9eDB3c_Nl_cTso8"
+		"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huLmRvZUBleGFtcGxlLmNvbSIsInVzZXJfaWQiOjEsInJvbGUiOjEsImNvbXBhbnlfaWQiOjEsImV4cCI6MTczNDQ3NzEwNX0.8pMSVhdgFaDbINR_HmOYlygbT5Y5mQ-P1rgbTEgwGS4"
 	);
 
 	const isTokenValidHandler = async (): Promise<boolean> => {
@@ -53,6 +53,12 @@ const AuthProvider: React.FC<IAuthProvider> = ({ children }) => {
 			return false;
 		}
 	};
+
+	useEffect(() => {
+		if (user == null) {
+			setToken("token");
+		}
+	}, [user]);
 
 	return <AuthContext.Provider value={{ user, token, isTokenValidHandler }}>{children}</AuthContext.Provider>;
 };
