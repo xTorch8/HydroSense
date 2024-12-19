@@ -16,6 +16,8 @@ import getProductLastComponentHandler from "../../api/product/getProductLastComp
 import deleteProductRequest from "../../types/api/product/deleteProductRequest";
 import deleteProductHandler from "../../api/product/deleteProductHandler";
 import Modal from "../../components/Modal";
+import predictProductQualityRequest from "../../types/api/product/predictProductQualityRequest";
+import predictProductQualityHandler from "../../api/product/predictProductQualityHandler";
 
 const ProductDetailPage = () => {
 	const navigate = useNavigate();
@@ -160,11 +162,7 @@ const ProductDetailPage = () => {
 
 	const [error, setError] = useState<string[]>([]);
 
-	const submitHandler = (event: React.SyntheticEvent<HTMLFormElement>) => {
-		event.preventDefault();
-
-		console.log("P");
-
+	const checkWaterButtonOnClickHandler = async () => {
 		let errorList = [];
 
 		let validationMap = {
@@ -173,13 +171,11 @@ const ProductDetailPage = () => {
 			nitrate: [0, 73],
 			chloride: [34, 1321],
 			lead: [0, 3.5],
-			zinc: [0, 24],
 			turbidity: [0, 18],
-			fluoride: [0, 12],
+			flouride: [0, 12],
 			copper: [0, 11],
 			odor: [0, 4],
 			sulfate: [12, 1393],
-			conductivity: [13, 1891],
 			chlorine: [1, 10],
 			manganese: [1, 23],
 			totalDissolvedSolids: [0, 579],
@@ -201,9 +197,41 @@ const ProductDetailPage = () => {
 		}
 
 		if (errorList.length == 0) {
-			setModalId(1);
+			await submitHandler();
 		} else {
 			setError(errorList);
+		}
+	};
+
+	const submitHandler = async () => {
+		const request: predictProductQualityRequest = {
+			pH: formState.pH,
+			iron: formState.iron,
+			nitrate: formState.nitrate,
+			chloride: formState.chloride,
+			lead: formState.lead,
+			turbidity: formState.turbidity,
+			flouride: formState.flouride,
+			copper: formState.copper,
+			odor: formState.odor,
+			sulfate: formState.sulfate,
+			chlorine: formState.chlorine,
+			manganese: formState.manganese,
+			totalDissolvedSolids: formState.totalDissolvedSolids,
+			productId: id,
+			token: authContext.token ?? "token",
+		};
+
+		const response = await predictProductQualityHandler(request);
+
+		if (axios.isAxiosError(response)) {
+			if (response.status == 401) {
+				navigate("../login");
+			} else {
+				console.log(response.status);
+			}
+		} else {
+			setModalId(response == "clean" ? 1 : 2);
 		}
 	};
 
@@ -406,7 +434,7 @@ const ProductDetailPage = () => {
 					<Input
 						label="Chloride (mg/L)"
 						id="input-chloride"
-						name="flouride"
+						name="chloride"
 						type="number"
 						value={formState.chloride}
 						isDisabled={isReadOnly}
@@ -440,7 +468,7 @@ const ProductDetailPage = () => {
 				{isReadOnly ? (
 					<>
 						<div>
-							<Button text="Check Water Quality" onClick={() => setModalId(2)} />
+							<Button text="Check Water Quality" onClick={checkWaterButtonOnClickHandler} />
 						</div>
 						<div>
 							<Button
