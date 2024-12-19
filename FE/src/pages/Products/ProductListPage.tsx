@@ -34,7 +34,7 @@ const ProductListPage = () => {
 					if (response.status === 401) {
 						navigate("../login");
 					} else {
-						console.log(response.status);
+						alert(`Error: ${response.message}`);
 					}
 				} else {
 					setData(response);

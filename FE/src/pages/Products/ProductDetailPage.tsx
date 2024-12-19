@@ -15,6 +15,9 @@ import getProductLastComponentRequest from "../../types/api/product/getProductLa
 import getProductLastComponentHandler from "../../api/product/getProductLastComponentHandler";
 import deleteProductRequest from "../../types/api/product/deleteProductRequest";
 import deleteProductHandler from "../../api/product/deleteProductHandler";
+import Modal from "../../components/Modal";
+import predictProductQualityRequest from "../../types/api/product/predictProductQualityRequest";
+import predictProductQualityHandler from "../../api/product/predictProductQualityHandler";
 
 const ProductDetailPage = () => {
 	const navigate = useNavigate();
@@ -59,6 +62,8 @@ const ProductDetailPage = () => {
 		manganese: 0,
 		waterQuality: "",
 	});
+
+	const [modalId, setModalId] = useState<number>(0);
 
 	let cleanPercentage = 0;
 
@@ -124,7 +129,7 @@ const ProductDetailPage = () => {
 				pH: parseFloat(waterDataDetail.pH),
 				lead: parseFloat(waterDataDetail.Lead),
 				odor: parseFloat(waterDataDetail.Odor),
-				totalDissolvedSolids: parseFloat(waterDataDetail.total_dissolved_solids),
+				totalDissolvedSolids: parseFloat(waterDataDetail["Total Dissolved Solids"]),
 				iron: parseFloat(waterDataDetail.Iron),
 				turbidity: parseFloat(waterDataDetail.Turbidity),
 				sulfate: parseFloat(waterDataDetail.Sulfate),
@@ -157,9 +162,7 @@ const ProductDetailPage = () => {
 
 	const [error, setError] = useState<string[]>([]);
 
-	const submitHandler = (event: React.SyntheticEvent<HTMLFormElement>) => {
-		event.preventDefault();
-
+	const checkWaterButtonOnClickHandler = async () => {
 		let errorList = [];
 
 		let validationMap = {
@@ -168,13 +171,11 @@ const ProductDetailPage = () => {
 			nitrate: [0, 73],
 			chloride: [34, 1321],
 			lead: [0, 3.5],
-			zinc: [0, 24],
 			turbidity: [0, 18],
-			fluoride: [0, 12],
+			flouride: [0, 12],
 			copper: [0, 11],
 			odor: [0, 4],
 			sulfate: [12, 1393],
-			conductivity: [13, 1891],
 			chlorine: [1, 10],
 			manganese: [1, 23],
 			totalDissolvedSolids: [0, 579],
@@ -184,11 +185,8 @@ const ProductDetailPage = () => {
 			if (formState[name as keyof typeof formState] != undefined) {
 				const value = formState[name as keyof typeof formState];
 
-				console.log(name, range, value, typeof value);
-
 				if (value != undefined && typeof value == "string") {
 					if (+value < range[0] || +value > range[1]) {
-						console.log("P");
 						errorList.push(`${name} must be between ${range[0]} and ${range[1]}!`);
 					}
 				}
@@ -198,8 +196,41 @@ const ProductDetailPage = () => {
 		}
 
 		if (errorList.length == 0) {
+			await submitHandler();
 		} else {
 			setError(errorList);
+		}
+	};
+
+	const submitHandler = async () => {
+		const request: predictProductQualityRequest = {
+			pH: formState.pH,
+			iron: formState.iron,
+			nitrate: formState.nitrate,
+			chloride: formState.chloride,
+			lead: formState.lead,
+			turbidity: formState.turbidity,
+			flouride: formState.flouride,
+			copper: formState.copper,
+			odor: formState.odor,
+			sulfate: formState.sulfate,
+			chlorine: formState.chlorine,
+			manganese: formState.manganese,
+			totalDissolvedSolids: formState.totalDissolvedSolids,
+			productId: id,
+			token: authContext.token ?? "token",
+		};
+
+		const response = await predictProductQualityHandler(request);
+
+		if (axios.isAxiosError(response)) {
+			if (response.status == 401) {
+				navigate("../login");
+			} else {
+				alert(`Error: ${response.message}`);
+			}
+		} else {
+			setModalId(response.prediction == "clean" ? 1 : 2);
 		}
 	};
 
@@ -237,6 +268,34 @@ const ProductDetailPage = () => {
 					<img src={backButton} className="block md:float-right cursor-pointer" onClick={navigateBackHandler} />
 				</div>
 			</div>
+
+			{modalId == 0 ? (
+				<></>
+			) : modalId == 1 ? (
+				<Modal
+					icon={"clean"}
+					message={`${name} is clean!`}
+					onClose={() => {
+						setModalId(0);
+						window.location.reload();
+					}}
+					onConfirm={() => {
+						setModalId(0);
+						window.location.reload();
+					}}
+				/>
+			) : (
+				<Modal
+					icon={"dirty"}
+					message={`${name} is dirty!`}
+					onClose={() => {
+						setModalId(0);
+					}}
+					onConfirm={() => {
+						setModalId(0);
+					}}
+				/>
+			)}
 
 			<form onSubmit={submitHandler}>
 				<div className="mt-8 mx-auto w-4/5">
@@ -376,7 +435,7 @@ const ProductDetailPage = () => {
 					<Input
 						label="Chloride (mg/L)"
 						id="input-chloride"
-						name="flouride"
+						name="chloride"
 						type="number"
 						value={formState.chloride}
 						isDisabled={isReadOnly}
@@ -410,7 +469,7 @@ const ProductDetailPage = () => {
 				{isReadOnly ? (
 					<>
 						<div>
-							<Button text="Check Water Quality" />
+							<Button text="Check Water Quality" onClick={checkWaterButtonOnClickHandler} />
 						</div>
 						<div>
 							<Button

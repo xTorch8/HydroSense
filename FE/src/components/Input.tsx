@@ -9,7 +9,6 @@ const Input = (props: InputType) => {
 	}
 
 	if (props.type != "image") {
-		console.log(props.isDisabled ?? false);
 		return (
 			<div className="flex flex-col">
 				<label className={"text-md font-semibold " + color} htmlFor={props.id}>
@@ -22,7 +21,7 @@ const Input = (props: InputType) => {
 					type={props.type}
 					placeholder={props.placeholder}
 					onChange={props.onChange}
-					value={props.value}
+					value={props.type == "number" ? (props.value == undefined || isNaN(parseFloat(props.value.toString())) ? 0 : props.value) : props.value}
 					disabled={props.isDisabled ?? false}
 				/>
 			</div>

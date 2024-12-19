@@ -8,8 +8,8 @@ import IAddProductForm from "../../types/model/IAddProductForm";
 import addProductRequest from "../../types/api/product/addProductRequest";
 import addProductHandler from "../../api/product/addProductHandler";
 import axios from "axios";
-import convertBlobUrlToBase64Handler from "../../utils/convertBlobToBase64Handler";
 import convertBlobToFileHandler from "../../utils/convertBlobToFileHandler";
+import Modal from "../../components/Modal";
 
 const AddProductPage = () => {
 	const authContext = useContext(AuthContext);
@@ -341,7 +341,7 @@ const AddProductPage = () => {
 					setError([response.message]);
 				}
 			} else {
-				console.log("Success");
+				setModalId(1);
 			}
 		} catch (e) {
 			setError(["Internal server error"]);
@@ -351,6 +351,8 @@ const AddProductPage = () => {
 	useEffect(() => {
 		setError([]);
 	}, [step]);
+
+	const [modalId, setModalId] = useState<number>(0);
 
 	return (
 		<div className="p-8" style={pageStyle}>
@@ -364,6 +366,12 @@ const AddProductPage = () => {
 			</p>
 
 			<h1 className="text-4xl underline text-white font-extrabold block text-center mt-8"> Product Data </h1>
+
+			{modalId == 0 ? (
+				<></>
+			) : (
+				<Modal icon={"success"} message={"Added successfully!"} onClose={() => navigate("../products")} onConfirm={() => navigate("../products")} />
+			)}
 
 			{step == 1 ? step1 : step2}
 
