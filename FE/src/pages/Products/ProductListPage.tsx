@@ -16,8 +16,8 @@ const ProductListPage = () => {
 
 	const authContext = useContext(AuthContext);
 
-	if (authContext == null || authContext?.user == null || authContext?.token == "token") {
-		navigate("../auth/login");
+	if (authContext == null) {
+		navigate("../login");
 	}
 
 	useEffect(() => {
@@ -32,7 +32,7 @@ const ProductListPage = () => {
 
 				if (axios.isAxiosError(response)) {
 					if (response.status === 401) {
-						navigate("../auth/login");
+						navigate("../login");
 					} else {
 						console.log(response.status);
 					}
@@ -82,6 +82,7 @@ const ProductListPage = () => {
 										id: item.product_id,
 										name: item.product_name,
 										image: item.product_image,
+										description: item.product_description,
 									},
 								});
 							}}

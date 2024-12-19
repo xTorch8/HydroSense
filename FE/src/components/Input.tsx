@@ -21,7 +21,8 @@ const Input = (props: InputType) => {
 					type={props.type}
 					placeholder={props.placeholder}
 					onChange={props.onChange}
-					value={props.value}
+					value={props.type == "number" ? (props.value == undefined || isNaN(parseFloat(props.value.toString())) ? 0 : props.value) : props.value}
+					disabled={props.isDisabled ?? false}
 				/>
 			</div>
 		);
@@ -70,7 +71,15 @@ const Input = (props: InputType) => {
 				>
 					<img src={productImage} className={inputImageClass} />
 				</div>
-				<input className="hidden" id={props.id} name={props.name} type="file" accept=".png,.jpg,.jpeg" onChange={imageChangeHandler} />
+				<input
+					className="hidden"
+					id={props.id}
+					name={props.name}
+					type="file"
+					accept=".png,.jpg,.jpeg"
+					onChange={imageChangeHandler}
+					disabled={props.isDisabled ?? false}
+				/>
 			</div>
 		);
 	}

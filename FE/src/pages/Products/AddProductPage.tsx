@@ -8,14 +8,16 @@ import IAddProductForm from "../../types/model/IAddProductForm";
 import addProductRequest from "../../types/api/product/addProductRequest";
 import addProductHandler from "../../api/product/addProductHandler";
 import axios from "axios";
+import convertBlobToFileHandler from "../../utils/convertBlobToFileHandler";
+import Modal from "../../components/Modal";
 
 const AddProductPage = () => {
 	const authContext = useContext(AuthContext);
 
 	const navigate = useNavigate();
 
-	if (authContext == null || authContext?.user == null || authContext?.token == "token") {
-		navigate("../auth/login");
+	if (authContext == null) {
+		navigate("../login");
 	}
 
 	const pageStyle = {
@@ -45,12 +47,24 @@ const AddProductPage = () => {
 	});
 
 	const formChangeHandler = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { name, value } = event.target;
+		const { name } = event.target;
 
-		setFormState((prevState) => ({
-			...prevState,
-			[name]: value,
-		}));
+		if (name === "image" && event.target instanceof HTMLInputElement && event.target.files) {
+			const file = event.target.files[0];
+			if (file) {
+				const imageUrl = URL.createObjectURL(file);
+				setFormState((prevState) => ({
+					...prevState,
+					productImage: imageUrl,
+				}));
+			}
+		} else {
+			const { value } = event.target;
+			setFormState((prevState) => ({
+				...prevState,
+				[name]: value,
+			}));
+		}
 	};
 
 	const step1 = (
@@ -79,16 +93,20 @@ const AddProductPage = () => {
 					/>
 				</div>
 				<div className="w-full md:w-1/2 mx-4 mt-4 md:mt-0">
-					<Input
-						id="input-image"
-						name="productImage"
-						label="Image (Opsional)"
-						type="image"
-						color="white"
-						imageHeight={21}
-						// value={formState.productImage}
-						onChange={formChangeHandler}
-					/>
+					<div className="flex flex-col row-span-2">
+						<label className="text-lg font-semibold text-white" htmlFor="input-image">
+							Image (Opsional)
+						</label>
+						<div
+							className="rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer h-[21rem]"
+							onClick={() => {
+								document.getElementById("input-image")?.click();
+							}}
+						>
+							<img src={formState.productImage} className="rounded-2xl h-[21rem] block mx-auto" />
+						</div>
+						<input className="hidden" id="input-image" name="image" type="file" accept=".png,.jpg,.jpeg" onChange={formChangeHandler} />
+					</div>
 				</div>
 			</div>
 		</>
@@ -295,7 +313,7 @@ const AddProductPage = () => {
 			const request: addProductRequest = {
 				name: formState.productName,
 				description: formState.productDescription,
-				image: formState.productImage,
+				image: await convertBlobToFileHandler(formState.productImage),
 				waterData: {
 					pH: formState.pH !== undefined ? parseFloat(formState.pH.toString()) : 0,
 					lead: formState.lead !== undefined ? parseFloat(formState.lead.toString()) : 0,
@@ -318,12 +336,12 @@ const AddProductPage = () => {
 
 			if (axios.isAxiosError(response)) {
 				if (response.status === 401) {
-					navigate("../auth/login");
+					navigate("../login");
 				} else {
 					setError([response.message]);
 				}
 			} else {
-				console.log("Success");
+				setModalId(1);
 			}
 		} catch (e) {
 			setError(["Internal server error"]);
@@ -333,6 +351,8 @@ const AddProductPage = () => {
 	useEffect(() => {
 		setError([]);
 	}, [step]);
+
+	const [modalId, setModalId] = useState<number>(0);
 
 	return (
 		<div className="p-8" style={pageStyle}>
@@ -346,6 +366,12 @@ const AddProductPage = () => {
 			</p>
 
 			<h1 className="text-4xl underline text-white font-extrabold block text-center mt-8"> Product Data </h1>
+
+			{modalId == 0 ? (
+				<></>
+			) : (
+				<Modal icon={"success"} message={"Added successfully!"} onClose={() => navigate("../products")} onConfirm={() => navigate("../products")} />
+			)}
 
 			{step == 1 ? step1 : step2}
 
