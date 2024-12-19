@@ -6,6 +6,7 @@ import AddProductPage from "./pages/Products/AddProductPage";
 import LoginPage from "./pages/Auth/LoginPage";
 import RegisterPage from "./pages/Auth/RegisterPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
+import ProfilePage from "./pages/Profile/ProfilePage";
 
 function App() {
 	return (
@@ -18,6 +19,7 @@ function App() {
 					<Route path="products/detail" element={<ProductDetailPage />} />
 					<Route path="products/add" element={<AddProductPage />} />
 					<Route path="dashboard" element={<DashboardPage />} />
+					<Route path="profile" element={<ProfilePage />} />
 				</Routes>
 			</BrowserRouter>
 		</AuthProvider>
