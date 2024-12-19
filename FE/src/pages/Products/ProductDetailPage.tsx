@@ -15,6 +15,7 @@ import getProductLastComponentRequest from "../../types/api/product/getProductLa
 import getProductLastComponentHandler from "../../api/product/getProductLastComponentHandler";
 import deleteProductRequest from "../../types/api/product/deleteProductRequest";
 import deleteProductHandler from "../../api/product/deleteProductHandler";
+import Modal from "../../components/Modal";
 
 const ProductDetailPage = () => {
 	const navigate = useNavigate();
@@ -59,6 +60,8 @@ const ProductDetailPage = () => {
 		manganese: 0,
 		waterQuality: "",
 	});
+
+	const [modalId, setModalId] = useState<number>(0);
 
 	let cleanPercentage = 0;
 
@@ -160,6 +163,8 @@ const ProductDetailPage = () => {
 	const submitHandler = (event: React.SyntheticEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
+		console.log("P");
+
 		let errorList = [];
 
 		let validationMap = {
@@ -184,8 +189,6 @@ const ProductDetailPage = () => {
 			if (formState[name as keyof typeof formState] != undefined) {
 				const value = formState[name as keyof typeof formState];
 
-				console.log(name, range, value, typeof value);
-
 				if (value != undefined && typeof value == "string") {
 					if (+value < range[0] || +value > range[1]) {
 						console.log("P");
@@ -198,6 +201,7 @@ const ProductDetailPage = () => {
 		}
 
 		if (errorList.length == 0) {
+			setModalId(1);
 		} else {
 			setError(errorList);
 		}
@@ -237,6 +241,32 @@ const ProductDetailPage = () => {
 					<img src={backButton} className="block md:float-right cursor-pointer" onClick={navigateBackHandler} />
 				</div>
 			</div>
+
+			{modalId == 0 ? (
+				<></>
+			) : modalId == 1 ? (
+				<Modal
+					icon={"clean"}
+					message={`${name} is clean!`}
+					onClose={() => {
+						setModalId(0);
+					}}
+					onConfirm={() => {
+						setModalId(0);
+					}}
+				/>
+			) : (
+				<Modal
+					icon={"dirty"}
+					message={`${name} is dirty!`}
+					onClose={() => {
+						setModalId(0);
+					}}
+					onConfirm={() => {
+						setModalId(0);
+					}}
+				/>
+			)}
 
 			<form onSubmit={submitHandler}>
 				<div className="mt-8 mx-auto w-4/5">
@@ -410,7 +440,7 @@ const ProductDetailPage = () => {
 				{isReadOnly ? (
 					<>
 						<div>
-							<Button text="Check Water Quality" />
+							<Button text="Check Water Quality" onClick={() => setModalId(2)} />
 						</div>
 						<div>
 							<Button

@@ -1,6 +1,6 @@
 type ModalType = {
-	onConfirm?: () => {};
-	onClose?: () => {};
+	onConfirm?: () => void;
+	onClose?: () => void;
 	icon: "clean" | "dirty" | "success";
 	message: string;
 };
