@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
-// import getLeaderboardHandler from "../../api/dashboard/getLeaderboardHandler";
 import axios from "axios";
 import Navbar from "../../components/Navbar";
 import defaultImage from "../../assets/default_pfp.png";
@@ -22,16 +21,7 @@ const DashboardPage = () => {
 
 	const [history, setHistory] = useState<any[]>([]);
 
-	// const defaultImage = "/assets/default_pfp.png";
-	// const medalImages = {
-	// 	gold: "/assets/gold_medal.png",
-	// 	silver: "/assets/silver_medal.png",
-	// 	bronze: "/assets/bronze_medal.png",
-	// };
-	// const icons = {
-	// 	correct: "/assets/correct_icon.png",
-	// 	wrong: "/assets/wrong_icon.png",
-	// };
+	const [companyImages, setCompanyImages] = useState<Record<number, string>>({});
 
 	useEffect(() => {
 		const validateAndFetchData = async () => {
@@ -40,25 +30,7 @@ const DashboardPage = () => {
 				return;
 			}
 
-			// const isValid = await authContext.isTokenValidHandler();
-			// if (!isValid) {
-			//     navigate("../auth/login");
-			//     return;
-			// }
-
 			try {
-				// const response = await getLeaderboardHandler({
-				//     token: authContext.token,
-				// });
-
-				// if (axios.isAxiosError(response)) {
-				//     console.error("Error fetching leaderboard:", response.message);
-				//     if (response.status === 401) {
-				//         navigate("../auth/login");
-				//     }
-				// } else {
-				//     setLeaderboardData(response);
-				// }
 
 				const leaderboardResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/leaderboard", {
 					headers: { Authorization: `Bearer ${authContext.token}` },
@@ -68,15 +40,40 @@ const DashboardPage = () => {
 					headers: { Authorization: `Bearer ${authContext.token}` },
 				});
 
-				setLeaderboardData(leaderboardResponse.data);
+				const leaderboardData = leaderboardResponse.data;
+				setLeaderboardData(leaderboardData);
 				setHistory(historyResponse.data);
+
+				// Ambil pfp company
+				const imageRequests = leaderboardData.map((company: any) =>
+					axios
+					  .get(`https://api.hydrosense.nextora.my.id/dashboard/companies/${company.company_id}`, {
+						headers: { Authorization: `Bearer ${authContext.token}` },
+					  })
+					  .then((response) => ({
+						companyId: company.company_id,
+						image: response.data.image,
+					  }))
+					  .catch(() => ({
+						companyId: company.company_id,
+						image: defaultImage, // default just in case nggak ada pfp
+					  }))
+				  );
+
+				const imageResults = await Promise.all(imageRequests);
+				const imagesMap: Record<number, string> = {};
+				imageResults.forEach((result) => {
+				imagesMap[result.companyId] = result.image;
+				});
+
+				setCompanyImages(imagesMap);
+
 			} catch (error) {
 				if (axios.isAxiosError(error)) {
 					if (error.status == 401) {
 						navigate("../login");
 					}
 				}
-				// console.error("Unexpected error:", error);
 				setLeaderboardData([]);
 				setHistory([]);
 			} finally {
@@ -121,12 +118,12 @@ const DashboardPage = () => {
 							.map((company, index) => {
 								let blockColor =
 									index === 0
-										? "bg-gold hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white"
+										? "bg-gold hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white rounded-lg mb-1"
 										: index === 1
-										? "bg-silver hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white"
+										? "bg-silver hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white rounded-lg mb-1"
 										: index === 2
-										? "bg-bronze hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white"
-										: "bg-biru2 hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white";
+										? "bg-bronze hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white rounded-lg mb-1"
+										: "bg-biru2 hover:bg-darkblue hover:text-white focus-within:bg-darkblue focus-within:text-white rounded-lg mb-1";
 
 								blockColor += " p-4 cursor-pointer transition duration-300 ease-in-out hover:opacity-100";
 
@@ -140,11 +137,11 @@ const DashboardPage = () => {
 												{medal ? (
 													<img src={medal} alt="medal" className="w-6 h-6 rounded-full border-2 border-darkblue" />
 												) : (
-													<span className="bg-white text-black px-2 py-1 rounded-full">{index + 1}</span>
+													<span className="bg-white text-black px-1.5 rounded-full border-2 border-darkblue text-sm">{index + 1}</span>
 												)}
 
 												{/* PFP Company */}
-												<img src={company.image_url || defaultImage} alt={company.company_name} className="w-10 h-10 object-cover rounded-full" />
+												<img src={companyImages[company.company_id] || defaultImage} alt={company.company_name} className="w-10 h-10 object-cover rounded-full" />
 
 												{/* Nama Company */}
 												<span className="font-bold text-lg">{company.company_name}</span>
@@ -184,7 +181,7 @@ const DashboardPage = () => {
 
 			{/* History */}
 			<h2 className="text-3xl font-bold text-center mt-12 underline">Product Check History</h2>
-			<div className="mx-auto w-4/5 mt-8">
+			<div className="mx-auto w-4/5 mt-8 mb-10">
 				<table className="w-full border-collapse border text-white bg-darkblue size-16 font-semibold">
 					<tbody>
 						{history.map((item) => (
