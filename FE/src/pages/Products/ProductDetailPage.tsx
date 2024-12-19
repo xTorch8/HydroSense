@@ -187,7 +187,6 @@ const ProductDetailPage = () => {
 
 				if (value != undefined && typeof value == "string") {
 					if (+value < range[0] || +value > range[1]) {
-						console.log("P");
 						errorList.push(`${name} must be between ${range[0]} and ${range[1]}!`);
 					}
 				}
@@ -228,7 +227,7 @@ const ProductDetailPage = () => {
 			if (response.status == 401) {
 				navigate("../login");
 			} else {
-				console.log(response.status);
+				alert(`Error: ${response.message}`);
 			}
 		} else {
 			setModalId(response == "clean" ? 1 : 2);

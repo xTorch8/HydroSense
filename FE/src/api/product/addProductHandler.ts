@@ -40,7 +40,6 @@ const addProductHandler = async (request: addProductRequest) => {
 
 		return response.data;
 	} catch (e) {
-		console.log(e);
 		return e;
 	}
 };
