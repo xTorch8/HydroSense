@@ -129,7 +129,7 @@ const ProductDetailPage = () => {
 				pH: parseFloat(waterDataDetail.pH),
 				lead: parseFloat(waterDataDetail.Lead),
 				odor: parseFloat(waterDataDetail.Odor),
-				totalDissolvedSolids: parseFloat(waterDataDetail.total_dissolved_solids),
+				totalDissolvedSolids: parseFloat(waterDataDetail["Total Dissolved Solids"]),
 				iron: parseFloat(waterDataDetail.Iron),
 				turbidity: parseFloat(waterDataDetail.Turbidity),
 				sulfate: parseFloat(waterDataDetail.Sulfate),
@@ -187,7 +187,6 @@ const ProductDetailPage = () => {
 
 				if (value != undefined && typeof value == "string") {
 					if (+value < range[0] || +value > range[1]) {
-						console.log("P");
 						errorList.push(`${name} must be between ${range[0]} and ${range[1]}!`);
 					}
 				}
@@ -228,10 +227,10 @@ const ProductDetailPage = () => {
 			if (response.status == 401) {
 				navigate("../login");
 			} else {
-				console.log(response.status);
+				alert(`Error: ${response.message}`);
 			}
 		} else {
-			setModalId(response == "clean" ? 1 : 2);
+			setModalId(response.prediction == "clean" ? 1 : 2);
 		}
 	};
 
@@ -278,9 +277,11 @@ const ProductDetailPage = () => {
 					message={`${name} is clean!`}
 					onClose={() => {
 						setModalId(0);
+						window.location.reload();
 					}}
 					onConfirm={() => {
 						setModalId(0);
+						window.location.reload();
 					}}
 				/>
 			) : (
