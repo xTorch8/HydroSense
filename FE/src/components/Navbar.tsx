@@ -1,23 +1,30 @@
 import { useNavigate } from "react-router";
 import NavbarType from "../types/components/NavbarType";
 import logo from "../assets/logo.png";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = (props: NavbarType) => {
+	const authContext = useContext(AuthContext);
+
 	const links = [
 		{
 			text: "Dashboard",
 			isActive: props.currentPage == "Dashboard",
 			link: "/dashboard",
+			roleAuthorized: [1, 2, 3],
 		},
 		{
 			text: "Product",
 			isActive: props.currentPage == "Product",
 			link: "/products",
+			roleAuthorized: [1, 3],
 		},
 		{
 			text: "Profile",
 			isActive: props.currentPage == "Profile",
 			link: "/profile",
+			roleAuthorized: [1, 3],
 		},
 	];
 
@@ -31,6 +38,18 @@ const Navbar = (props: NavbarType) => {
 			<nav>
 				<ul className="flex flex-row">
 					{links.map((item, index) => {
+						let isUserAuthorized = false;
+						for (let i = 0; i < item.roleAuthorized.length; i++) {
+							if (item.roleAuthorized[i] == authContext?.user?.role) {
+								isUserAuthorized = true;
+								break;
+							}
+						}
+
+						if (!isUserAuthorized) {
+							return <></>;
+						}
+
 						let className = "mx-4 cursor-pointer ";
 
 						if (item.isActive) {
