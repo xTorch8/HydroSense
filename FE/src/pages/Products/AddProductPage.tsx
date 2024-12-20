@@ -18,6 +18,8 @@ const AddProductPage = () => {
 
 	if (authContext == null) {
 		navigate("../login");
+	} else if (authContext.user?.role == 2) {
+		navigate("../dashboard");
 	}
 
 	const pageStyle = {

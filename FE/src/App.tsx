@@ -7,12 +7,14 @@ import LoginPage from "./pages/Auth/LoginPage";
 import RegisterPage from "./pages/Auth/RegisterPage";
 import DashboardPage from "./pages/Dashboard/DashboardPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
 	return (
 		<AuthProvider>
 			<BrowserRouter>
 				<Routes>
+					<Route path="/" element={<LandingPage />} />
 					<Route path="login" element={<LoginPage />} />
 					<Route path="register" element={<RegisterPage />} />
 					<Route path="products" element={<ProductListPage />} />
