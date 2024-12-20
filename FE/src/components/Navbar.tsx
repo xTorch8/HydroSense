@@ -26,6 +26,16 @@ const Navbar = (props: NavbarType) => {
 			link: "/profile",
 			roleAuthorized: [1, 3],
 		},
+		{
+			text: "Logout",
+			isActive: false,
+			link: "../login",
+			roleAuthorized: [2],
+			onClick: () => {
+				localStorage.removeItem("token");
+				navigate("../login");
+			},
+		},
 	];
 
 	const navigate = useNavigate();
@@ -60,7 +70,7 @@ const Navbar = (props: NavbarType) => {
 
 						return (
 							<li key={index}>
-								<a className={className} onClick={() => navigate(item.link)}>
+								<a className={className} onClick={item.onClick == null || item.onClick == undefined ? () => navigate(item.link) : item.onClick}>
 									{item.text}
 								</a>
 							</li>
