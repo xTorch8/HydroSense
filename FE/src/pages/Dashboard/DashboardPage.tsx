@@ -31,43 +31,45 @@ const DashboardPage = () => {
 			}
 
 			try {
-
 				const leaderboardResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/leaderboard", {
-					headers: { Authorization: `Bearer ${authContext.token}` },
-				});
-
-				const historyResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/company/history", {
 					headers: { Authorization: `Bearer ${authContext.token}` },
 				});
 
 				const leaderboardData = leaderboardResponse.data;
 				setLeaderboardData(leaderboardData);
-				setHistory(historyResponse.data);
+
+				if (authContext != null && authContext.user?.role != undefined && authContext.user?.role != 2) {
+					const historyResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/company/history", {
+						headers: { Authorization: `Bearer ${authContext.token}` },
+					});
+					setHistory(historyResponse.data);
+				} else {
+					setHistory([]);
+				}
 
 				// Ambil pfp company
 				const imageRequests = leaderboardData.map((company: any) =>
 					axios
-					  .get(`https://api.hydrosense.nextora.my.id/dashboard/companies/${company.company_id}`, {
-						headers: { Authorization: `Bearer ${authContext.token}` },
-					  })
-					  .then((response) => ({
-						companyId: company.company_id,
-						image: response.data.image,
-					  }))
-					  .catch(() => ({
-						companyId: company.company_id,
-						image: defaultImage, // default just in case nggak ada pfp
-					  }))
-				  );
+						.get(`https://api.hydrosense.nextora.my.id/dashboard/companies/${company.company_id}`, {
+							headers: { Authorization: `Bearer ${authContext.token}` },
+						})
+						.then((response) => ({
+							companyId: company.company_id,
+							image: response.data.image,
+						}))
+						.catch(() => ({
+							companyId: company.company_id,
+							image: defaultImage, // default just in case nggak ada pfp
+						}))
+				);
 
 				const imageResults = await Promise.all(imageRequests);
 				const imagesMap: Record<number, string> = {};
 				imageResults.forEach((result) => {
-				imagesMap[result.companyId] = result.image;
+					imagesMap[result.companyId] = result.image;
 				});
 
 				setCompanyImages(imagesMap);
-
 			} catch (error) {
 				if (axios.isAxiosError(error)) {
 					if (error.status == 401) {
@@ -141,7 +143,11 @@ const DashboardPage = () => {
 												)}
 
 												{/* PFP Company */}
-												<img src={companyImages[company.company_id] || defaultImage} alt={company.company_name} className="w-10 h-10 object-cover rounded-full" />
+												<img
+													src={companyImages[company.company_id] || defaultImage}
+													alt={company.company_name}
+													className="w-10 h-10 object-cover rounded-full"
+												/>
 
 												{/* Nama Company */}
 												<span className="font-bold text-lg">{company.company_name}</span>
@@ -180,24 +186,30 @@ const DashboardPage = () => {
 			)}
 
 			{/* History */}
-			<h2 className="text-3xl font-bold text-center mt-12 underline">Product Check History</h2>
-			<div className="mx-auto w-4/5 mt-8 mb-10">
-				<table className="w-full border-collapse border text-white bg-darkblue size-16 font-semibold">
-					<tbody>
-						{history.map((item) => (
-							<tr key={`H-${item.product_id}-${item.date}-${item.time}`} className="border-b text-center text-lg">
-								<td className="text-center">
-									<img src={item.result === "Clean" ? correctIcon : wrongIcon} alt={item.result} className="w-6 h-6 inline-block" />
-								</td>
-								<td className="text-center">{item.time}</td>
-								<td className="text-center">{item.date}</td>
-								<td className="text-center">{item.product_name}</td>
-								<td className="text-center">{item.result}</td>
-							</tr>
-						))}
-					</tbody>
-				</table>
-			</div>
+			{authContext != null && authContext?.user?.role != 2 ? (
+				<>
+					<h2 className="text-3xl font-bold text-center mt-12 underline">Product Check History</h2>
+					<div className="mx-auto w-4/5 mt-8 mb-10">
+						<table className="w-full border-collapse border text-white bg-darkblue size-16 font-semibold">
+							<tbody>
+								{history.map((item) => (
+									<tr key={`H-${item.product_id}-${item.date}-${item.time}`} className="border-b text-center text-lg">
+										<td className="text-center">
+											<img src={item.result === "Clean" ? correctIcon : wrongIcon} alt={item.result} className="w-6 h-6 inline-block" />
+										</td>
+										<td className="text-center">{item.time}</td>
+										<td className="text-center">{item.date}</td>
+										<td className="text-center">{item.product_name}</td>
+										<td className="text-center">{item.result}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+				</>
+			) : (
+				<></>
+			)}
 		</>
 	);
 };
