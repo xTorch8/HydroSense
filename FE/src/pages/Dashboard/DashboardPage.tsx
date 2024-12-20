@@ -30,24 +30,34 @@ const DashboardPage = () => {
 				return;
 			}
 
+			var leaderboardData = [];
+
 			try {
 				const leaderboardResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/leaderboard", {
 					headers: { Authorization: `Bearer ${authContext.token}` },
 				});
 
-				const leaderboardData = leaderboardResponse.data;
+				leaderboardData = leaderboardResponse.data;
+
 				setLeaderboardData(leaderboardData);
-
-				if (authContext != null && authContext.user?.role != undefined && authContext.user?.role != 2) {
-					const historyResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/company/history", {
-						headers: { Authorization: `Bearer ${authContext.token}` },
-					});
-					setHistory(historyResponse.data);
-				} else {
-					setHistory([]);
+			} catch (e) {
+				if (axios.isAxiosError(e) && e.status == 401) {
+					navigate("../login");
 				}
+				setLeaderboardData([]);
+			}
 
-				// Ambil pfp company
+			try {
+				const historyResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/company/history", {
+					headers: { Authorization: `Bearer ${authContext.token}` },
+				});
+
+				setHistory(historyResponse.data);
+			} catch (e) {
+				setHistory([]);
+			}
+
+			try {
 				const imageRequests = leaderboardData.map((company: any) =>
 					axios
 						.get(`https://api.hydrosense.nextora.my.id/dashboard/companies/${company.company_id}`, {
@@ -70,14 +80,8 @@ const DashboardPage = () => {
 				});
 
 				setCompanyImages(imagesMap);
-			} catch (error) {
-				if (axios.isAxiosError(error)) {
-					if (error.status == 401) {
-						navigate("../login");
-					}
-				}
-				setLeaderboardData([]);
-				setHistory([]);
+			} catch (e) {
+				setCompanyImages([]);
 			} finally {
 				setIsLoading(false);
 			}
@@ -85,6 +89,69 @@ const DashboardPage = () => {
 
 		validateAndFetchData();
 	}, []);
+
+	// useEffect(() => {
+	// 	const validateAndFetchData = async () => {
+	// 		if (authContext == null || authContext.isTokenValidHandler() == false) {
+	// 			navigate("../login");
+	// 			return;
+	// 		}
+
+	// 		try {
+	// 			const leaderboardResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/leaderboard", {
+	// 				headers: { Authorization: `Bearer ${authContext.token}` },
+	// 			});
+
+	// 			const leaderboardData = leaderboardResponse.data;
+	// 			setLeaderboardData(leaderboardData);
+
+	// 			if (authContext != null && authContext.user?.role != undefined && authContext.user?.role != 2) {
+	// 				const historyResponse = await axios.get("https://api.hydrosense.nextora.my.id/dashboard/company/history", {
+	// 					headers: { Authorization: `Bearer ${authContext.token}` },
+	// 				});
+	// 				setHistory(historyResponse.data);
+	// 			} else {
+	// 				setHistory([]);
+	// 			}
+
+	// 			// Ambil pfp company
+	// 			const imageRequests = leaderboardData.map((company: any) =>
+	// 				axios
+	// 					.get(`https://api.hydrosense.nextora.my.id/dashboard/companies/${company.company_id}`, {
+	// 						headers: { Authorization: `Bearer ${authContext.token}` },
+	// 					})
+	// 					.then((response) => ({
+	// 						companyId: company.company_id,
+	// 						image: response.data.image,
+	// 					}))
+	// 					.catch(() => ({
+	// 						companyId: company.company_id,
+	// 						image: defaultImage, // default just in case nggak ada pfp
+	// 					}))
+	// 			);
+
+	// 			const imageResults = await Promise.all(imageRequests);
+	// 			const imagesMap: Record<number, string> = {};
+	// 			imageResults.forEach((result) => {
+	// 				imagesMap[result.companyId] = result.image;
+	// 			});
+
+	// 			setCompanyImages(imagesMap);
+	// 		} catch (error) {
+	// 			if (axios.isAxiosError(error)) {
+	// 				if (error.status == 401) {
+	// 					navigate("../login");
+	// 				}
+	// 			}
+	// 			setLeaderboardData([]);
+	// 			setHistory([]);
+	// 		} finally {
+	// 			setIsLoading(false);
+	// 		}
+	// 	};
+
+	// 	validateAndFetchData();
+	// }, []);
 
 	const toggleCompanyProducts = async (companyId: number) => {
 		if (expandedCompany === companyId) {
