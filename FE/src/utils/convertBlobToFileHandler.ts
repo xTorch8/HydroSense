@@ -2,7 +2,9 @@ const convertBlobToFileHandler = async (blobUrl: string): Promise<File> => {
 	const response = await fetch(blobUrl);
 	const blob = await response.blob();
 
-	const file = new File([blob], blobUrl, { type: blob.type });
+	const date = new Date();
+
+	const file = new File([blob], date.getTime().toString(), { type: blob.type });
 
 	const dataTransfer = new DataTransfer();
 	dataTransfer.items.add(file);

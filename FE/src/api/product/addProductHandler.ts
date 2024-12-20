@@ -10,7 +10,7 @@ const addProductHandler = async (request: addProductRequest) => {
 		formData.append("Description", request.description);
 
 		if (request.image) {
-			formData.append("Image", request.image);
+			formData.append("image", request.image);
 		}
 
 		const waterData = JSON.stringify({
