@@ -27,6 +27,7 @@ const addProductHandler = async (request: addProductRequest) => {
 			Chlorine: request.waterData.chlorine,
 			Manganese: request.waterData.manganese,
 			Total_Dissolved_Solids: request.waterData.totalDissolvedSolids,
+			Description: request.description,
 		});
 
 		formData.append("water_data", waterData);
