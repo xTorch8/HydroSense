@@ -66,9 +66,6 @@ const LoginPage = () => {
 						/>
 					</div>
 
-					<div className="flex justify-between w-full py-1">
-						<span className="text-sm text-[#BFCAD5] hover:text-[#92DFF3]">Forgot password</span>
-					</div>
 
 					<button
 						onClick={handleLogin}
