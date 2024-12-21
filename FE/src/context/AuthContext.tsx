@@ -2,7 +2,6 @@ import { createContext, ReactNode, useEffect, useState } from "react";
 import AuthType from "../types/model/UserType";
 import getUserInformationHandler from "../api/auth/getUserInformationHandler";
 import axios from "axios";
-import { useNavigate } from "react-router";
 // import { useNavigate } from "react-router";
 
 interface IAuthContext {
