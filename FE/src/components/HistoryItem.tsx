@@ -1,4 +1,4 @@
-import HistoryItemType from "../types/HistoryItemType";
+import HistoryItemType from "../types/components/HistoryItemType";
 import correctIcon from "../assets/correct_icon.png";
 import wrongIcon from "../assets/wrong_icon.png";
 
