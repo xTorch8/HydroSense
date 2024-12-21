@@ -6,7 +6,7 @@ const predictProductQualityHandler = async (request: predictProductQualityReques
 	try {
 		const formData = new FormData();
 		if (request.image) {
-			formData.append("Image", request.image);
+			formData.append("image", request.image);
 		}
 
 		const waterData = JSON.stringify({
