@@ -40,3 +40,4 @@ jobs:
         local-dir: FE/dist/
         server-dir: /
         timeout: 180000
+        additional-args: --passive
