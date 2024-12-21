@@ -126,7 +126,7 @@ const ProductDetailPage = () => {
 			setFormState({
 				productName: response.ProductName,
 				productDescription: response.Description,
-				productImage: response.Image != undefined ? response.Image : image,
+				productImage: response.ProductImage,
 				pH: parseFloat(waterDataDetail.pH),
 				lead: parseFloat(waterDataDetail.Lead),
 				odor: parseFloat(waterDataDetail.Odor),
@@ -153,12 +153,24 @@ const ProductDetailPage = () => {
 	}, []);
 
 	const formChangeHandler = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-		const { name, value } = event.target;
+		const { name } = event.target;
 
-		setFormState((prevState) => ({
-			...prevState,
-			[name]: value,
-		}));
+		if (name === "image" && event.target instanceof HTMLInputElement && event.target.files) {
+			const file = event.target.files[0];
+			if (file) {
+				const imageUrl = URL.createObjectURL(file);
+				setFormState((prevState) => ({
+					...prevState,
+					productImage: imageUrl,
+				}));
+			}
+		} else {
+			const { value } = event.target;
+			setFormState((prevState) => ({
+				...prevState,
+				[name]: value,
+			}));
+		}
 	};
 
 	const [error, setError] = useState<string[]>([]);
@@ -378,7 +390,7 @@ const ProductDetailPage = () => {
 					<Input
 						label="Sulfate (mg/L)"
 						id="input-lead"
-						name="lead"
+						name="sulfate"
 						type="number"
 						value={formState.sulfate}
 						onChange={formChangeHandler}
@@ -424,7 +436,7 @@ const ProductDetailPage = () => {
 						onChange={formChangeHandler}
 						isDisabled={isReadOnly}
 					/>
-					<Input
+					{/* <Input
 						id="input-image"
 						name="productImage"
 						label="Image (Opsional)"
@@ -433,7 +445,21 @@ const ProductDetailPage = () => {
 						value={formState.productImage}
 						onChange={formChangeHandler}
 						isDisabled={isReadOnly}
-					/>
+					/> */}
+					<div className="flex flex-col row-span-2">
+						<label className="text-md font-semibold text-black" htmlFor="input-image">
+							Image (Opsional)
+						</label>
+						<div
+							className="rounded-2xl bg-white border-4 border-biru2 mt-2 text-black cursor-pointer h-[9rem]"
+							onClick={() => {
+								document.getElementById("input-image")?.click();
+							}}
+						>
+							<img src={formState.productImage} className="rounded-2xl h-[9rem] block mx-auto" />
+						</div>
+						<input className="hidden" id="input-image" name="image" type="file" accept=".png,.jpg,.jpeg" onChange={formChangeHandler} />
+					</div>
 					<Input
 						label="Chloride (mg/L)"
 						id="input-chloride"
