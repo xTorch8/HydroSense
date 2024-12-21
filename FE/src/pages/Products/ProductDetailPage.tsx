@@ -18,6 +18,7 @@ import deleteProductHandler from "../../api/product/deleteProductHandler";
 import Modal from "../../components/Modal";
 import predictProductQualityRequest from "../../types/api/product/predictProductQualityRequest";
 import predictProductQualityHandler from "../../api/product/predictProductQualityHandler";
+import convertBlobToFileHandler from "../../utils/convertBlobToFileHandler";
 
 const ProductDetailPage = () => {
 	const navigate = useNavigate();
@@ -123,9 +124,9 @@ const ProductDetailPage = () => {
 			const waterDataDetail = response.WaterDataDetail;
 
 			setFormState({
-				productName: name,
-				productDescription: description,
-				productImage: image,
+				productName: response.ProductName,
+				productDescription: response.Description,
+				productImage: response.Image != undefined ? response.Image : image,
 				pH: parseFloat(waterDataDetail.pH),
 				lead: parseFloat(waterDataDetail.Lead),
 				odor: parseFloat(waterDataDetail.Odor),
@@ -185,7 +186,7 @@ const ProductDetailPage = () => {
 			if (formState[name as keyof typeof formState] != undefined) {
 				const value = formState[name as keyof typeof formState];
 
-				if (value != undefined && typeof value == "string") {
+				if (value != undefined) {
 					if (+value < range[0] || +value > range[1]) {
 						errorList.push(`${name} must be between ${range[0]} and ${range[1]}!`);
 					}
@@ -218,6 +219,8 @@ const ProductDetailPage = () => {
 			manganese: formState.manganese,
 			totalDissolvedSolids: formState.totalDissolvedSolids,
 			productId: id,
+			description: formState.productDescription,
+			image: await convertBlobToFileHandler(formState.productImage),
 			token: authContext.token ?? "token",
 		};
 
@@ -301,9 +304,8 @@ const ProductDetailPage = () => {
 				<div className="mt-8 mx-auto w-4/5">
 					<Input
 						id="input-description"
-						name="description"
+						name="productDescription"
 						label="Description"
-						placeholder="..."
 						type="text"
 						value={formState.productDescription}
 						onChange={formChangeHandler}

@@ -79,7 +79,10 @@ const LoginPage = () => {
 
 					<div className="text-sm text-[#BFCAD5]">
 						Don't have an account?
-						<span className="text-white font-bold hover:text-[#92DFF3]"> Create One</span>
+						<span className="text-white font-bold hover:text-[#92DFF3] cursor-pointer" onClick={() => navigate("../register")}>
+							{" "}
+							Create One
+						</span>
 					</div>
 				</div>
 
