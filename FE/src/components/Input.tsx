@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router";
 import InputType from "../types/components/InputType";
 
 const Input = (props: InputType) => {
