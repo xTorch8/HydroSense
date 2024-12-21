@@ -3,7 +3,7 @@ name: Auto Deploy Hydrosense App to cPanel
 on:
   push:
     branches:
-      - main  # Automatically deploy on push to the main branch
+      - master  # Automatically deploy on push to the main branch
 
 jobs:
   build-and-deploy:
