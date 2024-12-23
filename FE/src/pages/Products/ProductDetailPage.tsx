@@ -194,10 +194,9 @@ const ProductDetailPage = () => {
 			totalDissolvedSolids: [0, 579],
 		};
 
-		for (let [name, range] of Object.entries(validationMap)) {
+		for (let [name] of Object.entries(validationMap)) {
 			if (formState[name as keyof typeof formState] != undefined) {
-				const value = formState[name as keyof typeof formState];
-
+				// const value = formState[name as keyof typeof formState];
 				// if (value != undefined) {
 				// 	if (+value < range[0] || +value > range[1]) {
 				// 		errorList.push(`${name} must be between ${range[0]} and ${range[1]}!`);
