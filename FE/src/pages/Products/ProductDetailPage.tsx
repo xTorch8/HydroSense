@@ -100,7 +100,7 @@ const ProductDetailPage = () => {
 			});
 
 			cleanPercentage = Math.floor((cleanCount / list.length) * 100);
-			setHistoryList(list);
+			setHistoryList(list.reverse());
 		} catch (e) {
 			setHistoryList([]);
 		}
